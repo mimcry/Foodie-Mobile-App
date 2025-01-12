@@ -45,7 +45,7 @@ try {
     if (response.ok){
 const result =await response.json()
 ToastAndroid.show("Signin successfull",ToastAndroid.SHORT)
-router.push("/(auth)/signin")
+router.push("/(auth)/otpVerification")
     }else{
         const error=await response.json();
         ToastAndroid.show("Error occured",ToastAndroid.SHORT) 
