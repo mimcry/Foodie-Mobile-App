@@ -8,68 +8,72 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
 
 const signup = async (req, res) => {
-    const { firstname, lastname, email, password, address, contact_number, usertype } = req.body;
-  
-    if (!firstname || !lastname || !email || !password || !address || !contact_number || !usertype) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-  
-    try {
-      // Check if the email is already verified
-      const otpVerificationResult = await pool.query(
-        "SELECT is_verified FROM otp_verification WHERE email = $1",
-        [email]
-      );
-  
-      if (otpVerificationResult.rows.length > 0) {
-        const { is_verified } = otpVerificationResult.rows[0];
-  
-        // If the email is verified, don't allow registration again
-        if (is_verified) {
-          return res.status(400).json({ error: "Email is already verified" });
-        } else {
-          // If the email exists but is not verified, delete the record and proceed with signup
-          await pool.query("DELETE FROM otp_verification WHERE email = $1", [email]);
-        }
+  const { name, email, password } = req.body;
+  console.log("signin", name);
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    // Check if the email is already verified
+    const otpVerificationResult = await pool.query(
+      "SELECT is_verified FROM otp_verification WHERE email = $1",
+      [email]
+    );
+
+    if (otpVerificationResult.rows.length > 0) {
+      const { is_verified } = otpVerificationResult.rows[0];
+
+      // If the email is verified, don't allow registration again
+      if (is_verified) {
+        return res.status(400).json({ error: "Email is already verified" });
+      } else {
+        // If the email exists but is not verified, delete the record and proceed with signup
+        await pool.query("DELETE FROM otp_verification WHERE email = $1", [email]);
       }
-  
-      // Check if the email already exists in the users table
-      const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-      if (existingUser.rows.length > 0) {
-        return res.status(400).json({ error: "Email already exists" });
-      }
-  
-      // Generate OTP and set expiry time
-      const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false, digits: true ,lowerCaseAlphabets:false,upperCaseAlphabets:false});
-      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-      
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Send OTP email
-      await transporter.sendMail({
-        from: "your_email@gmail.com",
-        to: email,
-        subject: "Email Verification OTP",
-        text: `Your OTP is ${otp}. It expires in 10 minutes.`,
-      });
-  
-      // Insert the new user into the users table
-      await pool.query(
-        "INSERT INTO users (firstname, lastname, email, password, address, contact_number, usertype) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [firstname, lastname, email, hashedPassword, address, contact_number, usertype]
-      );
-  
-      // Insert the OTP record into otp_verification table
-      await pool.query("INSERT INTO otp_verification (email, otp, otp_expiry) VALUES ($1, $2, $3)", [email, otp, otpExpiry]);
-  
-      // Respond with a success message
-      res.status(201).json({ message: "User registered. OTP sent." });
-    } catch (error) {
-      console.error("Signup error:", error);
-      res.status(500).json({ error: "Internal server error" });
     }
-  };
+
+    // Check if the email already exists in the users table
+    const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+
+    // Generate OTP and set expiry time
+    const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false, digits: true });
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Send OTP email
+    await transporter.sendMail({
+      from: "your_email@gmail.com",
+      to: email,
+      subject: "Email Verification OTP",
+      text: `Your OTP is ${otp}. It expires in 10 minutes.`,
+    });
+
+    // Insert the new user into the users table
+    await pool.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
+      [name, email, hashedPassword]
+    );
+
+    // Insert the OTP record into otp_verification table
+    await pool.query(
+      "INSERT INTO otp_verification (email, otp, otp_expiry) VALUES ($1, $2, $3)",
+      [email, otp, otpExpiry]
+    );
+
+    // Respond with a success message
+    res.status(201).json({ message: "User registered. OTP sent." });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
   
 const login= async (req, res) => {
   const { email, password } = req.body;

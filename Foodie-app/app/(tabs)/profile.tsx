@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -49,8 +49,11 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    router.push("/(auth)/authScreen")
+    router.push("/(auth)/signin")
   };
+  
+    
+  
 
   const EditModal = () => (
     <Modal
