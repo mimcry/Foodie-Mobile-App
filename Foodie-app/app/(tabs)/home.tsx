@@ -1,4 +1,4 @@
-import { useNavigation } from "expo-router";
+import { useNavigation,router } from "expo-router";
 import Icon from "@/constants/icons";
 import React, { useState, useEffect } from "react";
 import {

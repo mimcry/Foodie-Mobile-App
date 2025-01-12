@@ -10,7 +10,7 @@ import {
   Modal,
 } from "react-native";
 import { Camera } from "lucide-react-native";
-
+import { router } from "expo-router";
 const Profile = () => {
   const [user, setUser] = useState({
     name: "John Doe",
@@ -49,7 +49,7 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    console.log("Logging out...");
+    router.push("/(auth)/authScreen")
   };
 
   const EditModal = () => (
