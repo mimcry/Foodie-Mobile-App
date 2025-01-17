@@ -11,6 +11,8 @@ import {
   ToastAndroid,
 } from "react-native";
 import { router } from "expo-router";
+import { useAtom } from "jotai";
+import { userEmail } from "@/hooks/authAtom";
 interface Signin {
     name?:String;
     email?:string;
@@ -25,38 +27,51 @@ const SignUp = () => {
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [email,setEmail]=useAtom(userEmail)
   const handleSignUp = () => {
     console.log("Signing up with:", formData);
   };
- 
-  const onsubmit=async ()=>{
-setIsLoading(true)
-console.log("Signing up with:", formData);
-try { 
-    const response = await fetch("http://192.168.1.67:8000/api/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name:formData.name,email: formData.email,
-          password: formData.password,}),
-    });
+  const onSubmit = async () => {
+    setIsLoading(true);
+    console.log("Signing up with:", email);
+    setEmail(formData.email)
 
-    if (response.ok){
-const result =await response.json()
-ToastAndroid.show("Signin successfull",ToastAndroid.SHORT)
-router.push("/(auth)/otpVerification")
-    }else{
-        const error=await response.json();
-        ToastAndroid.show("Error occured",ToastAndroid.SHORT) 
+    try {
+      const response = await fetch("http://192.168.1.67:8000/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+        
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Signup successful:", result);
+        ToastAndroid.show("Signup successful", ToastAndroid.SHORT);
+       
+        // Navigate to OTP verification screen
+        router.push("/(auth)/otpVerification");
+      } else {
+        const error = await response.json();
+
+      
+        ToastAndroid.show(error.error, ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.error("Network or unexpected error:", error);
+      ToastAndroid.show("An error occurred. Please try again.", ToastAndroid.SHORT);
+    } finally {
+      setIsLoading(false);
     }
-} catch (error) {
-    ToastAndroid.show('An error occurred. Please try again.',ToastAndroid.SHORT) 
-}
-finally{
-    setIsLoading(false)
-}
-  }
+  };
+  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -176,7 +191,7 @@ finally{
             marginTop: 10,
           }}
           disabled={isLoading}
-          onPress={onsubmit}
+          onPress={onSubmit}
         >
           <Text style={{ color: "#fff", fontSize: 18, fontWeight: "600" }}>
           {isLoading ? "Signing Up..." : "Sign Up"}

@@ -33,6 +33,7 @@ const setProfile = async (req, res) => {
 const getProfile= async (req, res) => {
  
     const { id } = req.params;
+    console.log("id that is got is ",id)
     const { user } = req;
   
     if (parseInt(id) !== user.id) {

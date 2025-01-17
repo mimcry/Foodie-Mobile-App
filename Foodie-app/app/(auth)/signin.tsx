@@ -10,40 +10,58 @@ import {
   ScrollView,
   ToastAndroid,
 } from "react-native";
+import {
+  isLoggedInAtom,
+  userIdAtom,
+  accessTokenAtom,
+  refreshTokenAtom,
+} from "@/hooks/authAtom";
+import { useAtom } from "jotai";
 import { router } from "expo-router";
 const SignIn = () => {
+  const [isLoggedIn, setIsLoggedIn] = useAtom(isLoggedInAtom);
+  const [userId, setUserId] = useAtom(userIdAtom);
+  const [accesstoken, setAccessToken] = useAtom(accessTokenAtom);
+  const [, setRefreshToken] = useAtom(refreshTokenAtom);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-const [isLoading,setIsLoading]=useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const handleSignIn = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const data = {
-        email: email,
-        password: password,
-      };
+      email: email,
+      password: password,
+    };
     try {
-        const response = await fetch ("http://192.168.1.67:8000/api/login",{
-           method:"POST",
-           headers:{
-            "Content-Type":"application/json",
-           },
-           body:JSON.stringify(data)
-        })
-        if (response.ok){
-const result = await response.json()
-ToastAndroid.show("Login successfull",ToastAndroid.SHORT)
-router.push("/(tabs)/home")
-        }
-        else{
-const erroe =await response.json();
-        ToastAndroid.show("Error occured",ToastAndroid.SHORT) 
-        }
+      const response = await fetch("http://192.168.1.67:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setUserId(result.userId);
+        setIsLoggedIn(true);
+
+        setAccessToken(result.accessToken);
+
+        setRefreshToken(result.refreshToken);
+        ToastAndroid.show("Login successfull", ToastAndroid.SHORT);
+        router.push("/(tabs)/home");
+      } else {
+        const erroe = await response.json();
+        ToastAndroid.show("Error occured", ToastAndroid.SHORT);
+      }
     } catch (error) {
-      ToastAndroid.show('An error occurred. Please try again.',ToastAndroid.SHORT) 
-      }
-      finally{
-          setIsLoading(false)
-      }
+      ToastAndroid.show(
+        "An error occurred. Please try again.",
+        ToastAndroid.SHORT
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,7 +72,7 @@ const erroe =await response.json();
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 20 }}>
         <View style={{ alignItems: "center", marginTop: 60, marginBottom: 40 }}>
           <Image
-            source={require('@/image/logo.png')} // Replace with your logo path
+            source={require("@/image/logo.png")} // Replace with your logo path
             style={{ width: 200, height: 80 }}
             resizeMode="contain"
           />
@@ -125,9 +143,7 @@ const erroe =await response.json();
           disabled={isLoading}
         >
           <Text style={{ color: "#fff", fontSize: 18, fontWeight: "600" }}>
-          {
-            isLoading?"Logging in ...":"Login"
-          }
+            {isLoading ? "Logging in ..." : "Login"}
           </Text>
         </TouchableOpacity>
 
@@ -136,7 +152,7 @@ const erroe =await response.json();
             marginTop: 20,
             alignItems: "center",
           }}
-         onPress={() => router.push("/(auth)/signup")}
+          onPress={() => router.push("/(auth)/signup")}
         >
           <Text style={{ color: "#FF4B4B", fontSize: 16, fontWeight: "500" }}>
             Don't have an account? Sign Up

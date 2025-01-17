@@ -38,9 +38,22 @@ const signup = async (req, res) => {
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: "Email already exists" });
     }
-
+    function generateNumericOtp(length) {
+      let otp = '';
+      const digits = '0123456789';
+      for (let i = 0; i < length; i++) {
+        otp += digits[Math.floor(Math.random() * digits.length)];
+      }
+      return otp;
+    }
+    
+    // Usage
+    const otp = generateNumericOtp(6);
+    console.log("Generated OTP:", otp); // Example output: 483920
+    
     // Generate OTP and set expiry time
-    const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false, digits: true });
+    // const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false, digits: true });
+    console.log("otp message", otp)
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
     // Hash the password
@@ -195,7 +208,18 @@ const resendOtp= async (req, res) => {
         otpExpiry = otpRecord.rows[0].otp_expiry;
       } else {
         // Generate a new OTP if it's expired or not found
-        otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false, digits: true ,lowerCaseAlphabets:false,upperCaseAlphabets:false});
+        function generateNumericOtp(length) {
+          let otp = '';
+          const digits = '0123456789';
+          for (let i = 0; i < length; i++) {
+            otp += digits[Math.floor(Math.random() * digits.length)];
+          }
+          return otp;
+        }
+        
+        // Usage
+        const otp = generateNumericOtp(6);
+        console.log("Resend OTP:", otp); 
         otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
   
         // Save the new OTP in the database

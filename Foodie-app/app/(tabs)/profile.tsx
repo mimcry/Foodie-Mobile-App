@@ -11,7 +11,64 @@ import {
 } from "react-native";
 import { Camera } from "lucide-react-native";
 import { router } from "expo-router";
+import handelTokenExpiry from '@/utils/handelRefresh'
+import { useAtom } from "jotai";
+import { accessTokenAtom, userIdAtom ,userEmail} from "@/hooks/authAtom";
 const Profile = () => {
+  interface UserDetails {
+    name: string;
+    email: string;
+    phone: string;
+    avatar: string;
+  }
+
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [access_token] = useAtom(accessTokenAtom);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [id] = useAtom(userIdAtom);
+
+  console.log("user data",userDetails?.name)
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      
+      try {
+        if (!access_token) {
+          setError('No token found. Please log in again.');
+          return;
+        }
+
+        const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        if (response.status === 401) {
+          console.log('Token expired or invalid. Please log in again.');
+          handelTokenExpiry();
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch user details');
+          }
+        }
+
+        const data = await response.json();
+        setUserDetails(data);
+        setFormData(data);
+  
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        setError('Failed to load user profile');
+      }
+    };
+
+    fetchUserDetails();
+  }, [id, access_token]);
   const [user, setUser] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
@@ -118,8 +175,8 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Text style={styles.name}>{userDetails?.name}</Text>
+        <Text style={styles.email}>{userDetails?.email}</Text>
         <Text style={styles.phone}>{user.phone}</Text>
 
         <TouchableOpacity
