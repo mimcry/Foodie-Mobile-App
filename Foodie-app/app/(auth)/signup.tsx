@@ -53,7 +53,7 @@ const SignUp = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Signup successful:", result);
-        ToastAndroid.show("Signup successful", ToastAndroid.SHORT);
+        ToastAndroid.show("Signup successfully", ToastAndroid.SHORT);
        
         // Navigate to OTP verification screen
         router.push("/(auth)/otpVerification");

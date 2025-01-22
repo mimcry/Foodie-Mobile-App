@@ -28,29 +28,29 @@ const Homepage: React.FC = () => {
   const [suggestions, setSuggestions] = useState<FoodItem[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
 
-  useEffect(() => {
-    fetchFoodData();
-    fetchTagData();
-  }, []);
+  // useEffect(() => {
+  //   fetchFoodData();
+  //   fetchTagData();
+  // }, []);
 
-  const fetchFoodData = () => {
-    fetch("http://192.168.1.67:9002/food")
-      .then((response) => response.json())
-      .then((data) => {
-        setFoodItems(data);
-        setFilteredFoodItems(data);
-      })
-      .catch((error) => console.error("Error fetching food data:", error));
-  };
-  console.log("fooditems", foodItems);
-  console.log("filterdfood", filteredFoodItems);
-  console.log("tags", tags);
-  const fetchTagData = () => {
-    fetch("http://192.168.1.67:9002/tags")
-      .then((response) => response.json())
-      .then((data) => setTags(data))
-      .catch((error) => console.error("Error fetching tags:", error));
-  };
+  // const fetchFoodData = () => {
+  //   fetch("http://192.168.1.67:9002/food")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setFoodItems(data);
+  //       setFilteredFoodItems(data);
+  //     })
+  //     .catch((error) => console.error("Error fetching food data:", error));
+  // };
+  // console.log("fooditems", foodItems);
+  // console.log("filterdfood", filteredFoodItems);
+  // console.log("tags", tags);
+  // const fetchTagData = () => {
+  //   fetch("http://192.168.1.67:9002/tags")
+  //     .then((response) => response.json())
+  //     .then((data) => setTags(data))
+  //     .catch((error) => console.error("Error fetching tags:", error));
+  // };
 
   const navigateToFood = (name: string, _id: string) => {
     navigation.navigate("foodscreen", {
@@ -323,9 +323,9 @@ const Homepage: React.FC = () => {
                 {renderTagSelection()}
               </View>
               <View style={{ marginHorizontal: 20 }}>
-                <Featured_Food />
+                {/* <Featured_Food />
                 <Popular />
-                <OfferCard />
+                <OfferCard /> */}
               </View>
             </>
           }
