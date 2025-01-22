@@ -8,62 +8,62 @@ import {
   ScrollView,
   TextInput,
   Modal,
+  ToastAndroid,
 } from "react-native";
 import { Camera } from "lucide-react-native";
 import { router } from "expo-router";
-import handelTokenExpiry from '@/utils/handelRefresh'
+import handelTokenExpiry from "@/utils/handelRefresh";
 import { useAtom } from "jotai";
-import { accessTokenAtom, userIdAtom ,userEmail} from "@/hooks/authAtom";
+import { accessTokenAtom, userIdAtom, userEmail } from "@/hooks/authAtom";
 const Profile = () => {
   interface UserDetails {
     name: string;
     email: string;
-    phone: string;
-    avatar: string;
+    phone_number?: Int32Array;
+    avatar?: string;
+    address?: string;
   }
 
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [access_token] = useAtom(accessTokenAtom);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState(null);
   const [id] = useAtom(userIdAtom);
 
-  console.log("user data",userDetails?.name)
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      
       try {
         if (!access_token) {
-          setError('No token found. Please log in again.');
+          setError("No token found. Please log in again.");
           return;
         }
 
         const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
-          method: 'GET',
+          method: "GET",
           headers: {
             Authorization: `Bearer ${access_token}`,
           },
         });
 
         if (response.status === 401) {
-          console.log('Token expired or invalid. Please log in again.');
+          console.log("Token expired or invalid. Please log in again.");
           handelTokenExpiry();
 
           if (!response.ok) {
-            throw new Error('Failed to fetch user details');
+            throw new Error("Failed to fetch user details");
           }
         }
 
         const data = await response.json();
         setUserDetails(data);
+        setEditedUser(data)
         setFormData(data);
-  
       } catch (error) {
-        console.error('Error fetching user details:', error);
-        setError('Failed to load user profile');
+        console.error("Error fetching user details:", error);
+        setError("Failed to load user profile");
       }
     };
 
@@ -72,14 +72,15 @@ const Profile = () => {
   const [user, setUser] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
-    phone: "+1 234 567 8900",
+  
     avatar:
       "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/6692db04-404e-4d58-8c2c-bab7b56b9177/dg4vpqt-597328a9-9115-4cbf-9d32-c6194a8e80d9.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzY2OTJkYjA0LTQwNGUtNGQ1OC04YzJjLWJhYjdiNTZiOTE3N1wvZGc0dnBxdC01OTczMjhhOS05MTE1LTRjYmYtOWQzMi1jNjE5NGE4ZTgwZDkuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.Uats5toV7VzhM-NrAgf-XT007K73CJh-EfNokND9TUE",
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(user);
+  const [editedUser, setEditedUser] = useState(userDetails);
 
+  console.log("user data", editedUser?.phone_number);
   const sections = [
     {
       title: "Account Settings",
@@ -100,269 +101,390 @@ const Profile = () => {
     },
   ];
 
-  const handleSave = () => {
-    setUser(editedUser);
-    setIsEditing(false);
-  };
 
   const handleLogout = () => {
-    router.push("/(auth)/signin")
+    router.push("/(auth)/signin");
   };
-  
-    
-  
-
-  const EditModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isEditing}
-      onRequestClose={() => setIsEditing(false)}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit Profile</Text>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Name</Text>
-            <TextInput
-              style={styles.input}
-              value={editedUser.name}
-              onChangeText={(text) =>
-                setEditedUser({ ...editedUser, name: text })
-              }
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Phone</Text>
-            <TextInput
-              style={styles.input}
-              value={editedUser.phone}
-              onChangeText={(text) =>
-                setEditedUser({ ...editedUser, phone: text })
-              }
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={() => setIsEditing(false)}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
-              onPress={handleSave}
-            >
-              <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
+        body: JSON.stringify({
+          name: editedUser?.name ?? "",
+          phone_number: editedUser?.phone_number ?? "",
+          address: editedUser?.address ?? "",
+        }),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        ToastAndroid.show("Profile updated successfully", ToastAndroid.SHORT);
+        router.push("/home");
+      } else {
+        const error = await response.json();
+        ToastAndroid.show(error.error, ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.error("Network or unexpected error:", error);
+      ToastAndroid.show(
+        "An error occurred. Please try again.",
+        ToastAndroid.SHORT
+      );
+    }
+  };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          <TouchableOpacity style={styles.cameraButton}>
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: "#f5f5f5",
+      }}
+    >
+      <View
+        style={{
+          alignItems: "center",
+          padding: 20,
+          backgroundColor: "#fff",
+          borderBottomWidth: 1,
+          borderBottomColor: "#eee",
+        }}
+      >
+        <View
+          style={{
+            position: "relative",
+            marginBottom: 10,
+            borderColor: "#df2020",
+            borderWidth: 2,
+            borderRadius: 360,
+          }}
+        >
+          <Image
+            source={{ uri: user.avatar }}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+            }}
+          />
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              backgroundColor: "#df2020",
+              padding: 8,
+              borderRadius: 20,
+            }}
+          >
             <Camera size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.name}>{userDetails?.name}</Text>
-        <Text style={styles.email}>{userDetails?.email}</Text>
-        <Text style={styles.phone}>{user.phone}</Text>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            marginBottom: 5,
+          }}
+        >
+          {userDetails?.name}
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#666",
+            marginBottom: 5,
+          }}
+        >
+          {userDetails?.email}
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#666",
+            marginBottom: 15,
+          }}
+        >
+          {userDetails?.phone_number}
+        </Text>
 
         <TouchableOpacity
-          style={styles.editButton}
+          style={{
+            backgroundColor: "#df2020",
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 20,
+          }}
           onPress={() => setIsEditing(true)}
         >
-          <Text style={styles.editButtonText}>Edit Profile</Text>
+          <Text
+            style={{
+              color: "#fff",
+              fontWeight: "600",
+            }}
+          >
+            Edit Profile
+          </Text>
         </TouchableOpacity>
       </View>
 
       {sections.map((section, index) => (
-        <View key={index} style={styles.section}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
+        <View
+          key={index}
+          style={{
+            backgroundColor: "#fff",
+            marginTop: 20,
+            paddingVertical: 10,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "600",
+              paddingHorizontal: 15,
+              marginBottom: 10,
+            }}
+          >
+            {section.title}
+          </Text>
           {section.items.map((item, itemIndex) => (
             <TouchableOpacity
               key={itemIndex}
-              style={styles.menuItem}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingVertical: 12,
+                paddingHorizontal: 15,
+              }}
               onPress={() => console.log(`Navigating to ${item.title}`)}
             >
-              <Text style={styles.menuIcon}>{item.icon}</Text>
-              <Text style={styles.menuText}>{item.title}</Text>
+              <Text
+                style={{
+                  fontSize: 20,
+                  marginRight: 15,
+                }}
+              >
+                {item.icon}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#333",
+                }}
+              >
+                {item.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
       ))}
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
+      <TouchableOpacity
+        style={{
+          marginVertical: 20,
+          marginHorizontal: 15,
+          backgroundColor: "#df2020",
+          padding: 15,
+          borderRadius: 10,
+          alignItems: "center",
+        }}
+        onPress={handleLogout}
+      >
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 16,
+            fontWeight: "600",
+          }}
+        >
+          Logout
+        </Text>
       </TouchableOpacity>
 
-      <EditModal />
+      {isEditing && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isEditing}
+          onRequestClose={() => setIsEditing(false)}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: 15,
+                padding: 20,
+                width: "90%",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  marginBottom: 20,
+                  textAlign: "center",
+                }}
+              >
+                Edit Profile
+              </Text>
+              <View
+                style={{
+                  marginBottom: 15,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginBottom: 5,
+                    color: "#666",
+                  }}
+                >
+                  Name
+                </Text>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ddd",
+                    borderRadius: 8,
+                    padding: 10,
+                    fontSize: 16,
+                  }}
+                  value={editedUser?.phone_number }
+                  onChangeText={(text) =>
+                    setEditedUser((prev) =>
+                      prev ? { ...prev, name: text } : { name: text }
+                    )
+                  }
+                />
+              </View>
+
+              <View
+                style={{
+                  marginBottom: 15,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginBottom: 5,
+                    color: "#666",
+                  }}
+                >
+                  Phone
+                </Text>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ddd",
+                    borderRadius: 8,
+                    padding: 10,
+                    fontSize: 16,
+                  }}
+                  value={editedUser?.phone_number??""}
+                  onChangeText={(text) =>
+                    setEditedUser((prev) =>
+                      prev ? { ...prev, phone_number: text } : { phone_number: text }
+                    )
+                  }
+                  keyboardType="phone-pad"
+                />
+              </View>
+              <View
+                style={{
+                  marginBottom: 15,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginBottom: 5,
+                    color: "#666",
+                  }}
+                >
+                  Address
+                </Text>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ddd",
+                    borderRadius: 8,
+                    padding: 10,
+                    fontSize: 16,
+                  }}
+                  value={editedUser?.address ?? ""}
+                  onChangeText={(text) =>
+                    setEditedUser((prev) =>
+                      prev ? { ...prev, address: text } : { address: text }
+                    )
+                  }
+                />
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    padding: 15,
+                    borderRadius: 8,
+                    marginHorizontal: 5,
+                    backgroundColor: "#FF3B30",
+                  }}
+                  onPress={() => setIsEditing(false)}
+                >
+                  <Text
+                    style={{
+                      color: "#fff",
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: 16,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    padding: 15,
+                    borderRadius: 8,
+                    marginHorizontal: 5,
+                    backgroundColor: "green",
+                  }}
+                  onPress={handleSave}
+                >
+                  <Text
+                    style={{
+                      color: "#fff",
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: 16,
+                    }}
+                  >
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  avatarContainer: {
-    position: "relative",
-    marginBottom: 10,
-    borderColor: "#df2020",
-    borderWidth: 2,
-    borderRadius: 360,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  cameraButton: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#df2020",
-    padding: 8,
-    borderRadius: 20,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  email: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 5,
-  },
-  phone: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 15,
-  },
-  editButton: {
-    backgroundColor: "#df2020",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  editButtonText: {
-    color: "#dfff",
-    fontWeight: "600",
-  },
-  section: {
-    backgroundColor: "#fff",
-    marginTop: 20,
-    paddingVertical: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    paddingHorizontal: 15,
-    marginBottom: 10,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-  },
-  menuIcon: {
-    fontSize: 20,
-    marginRight: 15,
-  },
-  menuText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  logoutButton: {
-    marginVertical: 20,
-    marginHorizontal: 15,
-    backgroundColor: "#df2020",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  logoutText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    padding: 20,
-    width: "90%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  inputLabel: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: "#666",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  button: {
-    flex: 1,
-    padding: 15,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
-  cancelButton: {
-    backgroundColor: "#FF3B30",
-  },
-  saveButton: {
-    backgroundColor: "green",
-  },
-  buttonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-});
 
 export default Profile;
