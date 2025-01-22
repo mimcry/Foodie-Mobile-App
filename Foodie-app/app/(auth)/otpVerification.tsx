@@ -58,6 +58,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({ onVerify }) => {
 
       if (response.ok) {
         ToastAndroid.show("OTP resent successfully", ToastAndroid.SHORT);
+        router.push("/(auth)/signin")
       } else {
         ToastAndroid.show(
           data.error || "Failed to resend OTP",

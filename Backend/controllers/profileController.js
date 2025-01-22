@@ -2,7 +2,7 @@ const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const setProfile = async (req, res) => {
     const { id } = req.params;
-    const { firstname, lastname, address, contact_number } = req.body; // Extract fields from request body
+    const { name, address, contact_number } = req.body; // Extract fields from request body
     const { user } = req;
   
     if (parseInt(id) !== user.id) {
@@ -12,8 +12,8 @@ const setProfile = async (req, res) => {
     try {
       // Update user details in the database
       const updatedUser = await pool.query(
-        "UPDATE users SET firstname = $1, lastname = $2, address = $3, contact_number = $4 WHERE id = $5 RETURNING *",
-        [firstname, lastname, address, contact_number, id]
+        "UPDATE users SET fullname = $1, address = $2, contact_number = $3 WHERE id = $5 RETURNING *",
+        [name, address, contact_number, id]
       );
   
       if (updatedUser.rows.length === 0) {
