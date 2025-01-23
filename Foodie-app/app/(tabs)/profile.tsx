@@ -9,12 +9,14 @@ import {
   TextInput,
   Modal,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import { Camera,Mail,Phone,MapPin } from "lucide-react-native";
 import { router } from "expo-router";
 import handelTokenExpiry from "@/utils/handelRefresh";
 import { useAtom } from "jotai";
 import { accessTokenAtom, userIdAtom, userEmail } from "@/hooks/authAtom";
+import * as ImagePicker from "expo-image-picker";
 const Profile = () => {
   interface UserDetails {
     name: string |null;
@@ -33,12 +35,75 @@ const Profile = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [access_token] = useAtom(accessTokenAtom);
-
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState(null);
   const [id] = useAtom(userIdAtom);
 
+  const requestPermission = async () => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission required",
+          "This app needs access to your photo library to change the avatar."
+        );
+      }
+    } catch (error) {
+      console.error("Error requesting permission:", error);
+    }
+  };
 
+  useEffect(() => {
+    requestPermission();
+  }, []);
+  console.log("image uri",avatarUri)
+
+  const handleAvatarChange = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+  
+      if (result.canceled) return;
+  
+      if (result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        setAvatarUri(imageUri);
+        const formData = new FormData();
+        formData.append("avatar", {
+          uri: imageUri,
+          type: 'image/jpeg',
+          name: 'avatar.jpg'
+        });
+  
+        const response = await fetch(`http://192.168.1.67:8000/profile/${id}/avatar`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        });
+  
+        const responseData = await response.json();
+  
+        if (response.ok) {
+          setAvatarUri(responseData.user.avatar);
+          ToastAndroid.show("Avatar uploaded successfully", ToastAndroid.SHORT);
+        } else {
+          Alert.alert("Error", responseData.error);
+        }
+      }
+    } catch (error) {
+      console.error("Avatar upload error:", error);
+      Alert.alert("Error", "Failed to upload avatar");
+    }
+  };
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -161,7 +226,8 @@ const Profile = () => {
       );
     }
   };
-  
+  const avatarUrl = `http://192.168.1.67:8000${userDetails?.avatar}`;
+  const avatarUrl2 = `http://192.168.1.67:8000${avatarUri}`;
 
   return (
     <ScrollView
@@ -189,7 +255,7 @@ const Profile = () => {
     }}
   >
     <Image
-      source={{ uri: user.avatar }}
+   source={{ uri: avatarUrl || avatarUrl2 }}
       style={{
         width: 100,
         height: 100,
@@ -205,6 +271,7 @@ const Profile = () => {
         padding: 8,
         borderRadius: 20,
       }}
+      onPress={handleAvatarChange}
     >
       <Camera size={20} color="#fff" />
     </TouchableOpacity>
