@@ -71,11 +71,12 @@ const getProfile= async (req, res) => {
   
     // Construct the avatar URL
     const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-  
+  console.log("avatarurl",avatarUrl)
+  console.log("file path",req.file)
     try {
       // Update user's avatar in the database
       const result = await pool.query(
-        "UPDATE users SET avatar = $1 WHERE id = $2 RETURNING id, firstname, lastname, email, avatar",
+        "UPDATE users SET avatar = $1 WHERE id = $2 RETURNING id, name, email, avatar",
         [avatarUrl, id]
       );
   
