@@ -8,7 +8,7 @@ import {
   ScrollView,
   TextInput,
   Modal,
-  ToastAndroid,
+  ToastAndroid,  RefreshControl,
   Alert,
 } from "react-native";
 import { Camera,Mail,Phone,MapPin } from "lucide-react-native";
@@ -17,6 +17,9 @@ import handelTokenExpiry from "@/utils/handelRefresh";
 import { useAtom } from "jotai";
 import { accessTokenAtom, userIdAtom, userEmail } from "@/hooks/authAtom";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAccessToken } from "@/utils/access_Token";
+import { userId } from "@/utils/id";
 const Profile = () => {
   interface UserDetails {
     name: string |null;
@@ -25,7 +28,8 @@ const Profile = () => {
     avatar?: string|null;
     address?: string|null;
   }
-
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [userDetails, setUserDetails] = useState<UserDetails | null>({
     name: "",
     email: "",
@@ -34,12 +38,20 @@ const Profile = () => {
     address: "",
   });
   const [error, setError] = useState<string | null>(null);
-  const [access_token] = useAtom(accessTokenAtom);
+
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState(null);
   const [id] = useAtom(userIdAtom);
 
+  const onRefresh =async()=>{
+    setRefreshing(true);
+    const access_token =await getAccessToken()
+    const id = await userId();
+await fetchUserDetails();
+setRefreshing(false)
+setRefreshKey((prevKey) => prevKey + 1);
+  }
   const requestPermission = async () => {
     try {
       const { status } =
@@ -58,10 +70,13 @@ const Profile = () => {
   useEffect(() => {
     requestPermission();
   }, []);
-  console.log("image uri",avatarUri)
+
 
   const handleAvatarChange = async () => {
+
     try {
+      const access_token =await  getAccessToken();
+      const id = await userId();
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -80,7 +95,9 @@ const Profile = () => {
           type: 'image/jpeg',
           name: 'avatar.jpg'
         });
-  
+  if(!access_token){
+    console.log("No token found. Please log in again.");
+  }
         const response = await fetch(`http://192.168.1.67:8000/profile/${id}/avatar`, {
           method: "PUT",
           headers: {
@@ -89,7 +106,12 @@ const Profile = () => {
           },
           body: formData,
         });
-  
+        if (response.status === 401) {
+          console.log("Token expired or invalid. Please log in again.");
+          handelTokenExpiry();
+
+         
+        }
         const responseData = await response.json();
   
         if (response.ok) {
@@ -104,42 +126,41 @@ const Profile = () => {
       Alert.alert("Error", "Failed to upload avatar");
     }
   };
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        if (!access_token) {
-          setError("No token found. Please log in again.");
-          return;
-        }
+  const fetchUserDetails = async () => {
+    const access_token =await  getAccessToken()
+    const id = await userId();
+    if (!access_token) {
+      setError("No token found. Please log in again.");
+      return;
+    }
 
-        const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        });
+    try {
+      
+      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
 
-        if (response.status === 401) {
-          console.log("Token expired or invalid. Please log in again.");
-          handelTokenExpiry();
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch user details");
-          }
-        }
-
-        const data = await response.json();
-        setUserDetails(data);
-        setEditedUser(data)
-        setFormData(data);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-        setError("Failed to load user profile");
+      if (response.status === 401) {
+        console.log("Token expired or invalid.");
+        handelTokenExpiry();
       }
-    };
 
+      const data = await response.json();
+      setUserDetails(data);
+      setEditedUser(data);
+      setFormData(data);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      setError("Failed to load user profile");
+    }
+  };
+  useEffect(() => {
+  
+  
     fetchUserDetails();
-  }, [id, access_token]);
+  }, [id]);
+  
   const [user, setUser] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
@@ -175,10 +196,18 @@ const Profile = () => {
 
   const handleLogout = () => {
     router.push("/(auth)/signin");
+    AsyncStorage.removeItem("isLoggedIn");
+    AsyncStorage.removeItem("userId");
+    AsyncStorage.removeItem("accessToken");
+    AsyncStorage.removeItem("refreshToken");
+
   };
   const handleSave = async () => {
+  
     setIsEditing(false);
     try {
+      const access_token =await  getAccessToken();
+      const id = await userId();
       const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
         method: "PUT",
         headers: {
@@ -191,7 +220,10 @@ const Profile = () => {
           address: editedUser?.address ?? "",
         }),
       });
-  
+  if(response.status ===401){
+    console.log("Token expired or invalid. Please log in again")
+    handelTokenExpiry();
+  }
       if (response.ok) {
         const result = await response.json();
   
@@ -226,15 +258,18 @@ const Profile = () => {
       );
     }
   };
-  const avatarUrl = `http://192.168.1.67:8000${userDetails?.avatar}`;
-  const avatarUrl2 = `http://192.168.1.67:8000${avatarUri}`;
-
+  const avatarUrl =userDetails?.avatar;
+  
+  console.log("image uri",avatarUrl)
   return (
     <ScrollView
       style={{
         flex: 1,
         backgroundColor: "#f5f5f5",
       }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={ onRefresh}  colors={["#df2020"]}  tintColor="#df2020" />
+
+      }
     >
      <View
   style={{
@@ -254,14 +289,23 @@ const Profile = () => {
       borderRadius: 360,
     }}
   >
-    <Image
-   source={{ uri: avatarUrl || avatarUrl2 }}
+ {avatarUrl && avatarUri ?(   <Image
+   source={{ uri:`http://192.168.1.67:8000${avatarUrl||avatarUri}` }}
       style={{
         width: 100,
         height: 100,
         borderRadius: 50,
       }}
-    />
+    />):(
+      <Image
+      source={require("@/image/avatar.jpg")}
+         style={{
+           width: 100,
+           height: 100,
+           borderRadius: 50,
+         }}
+       />
+    )}
     <TouchableOpacity
       style={{
         position: "absolute",
@@ -319,7 +363,7 @@ const Profile = () => {
         color: "#666",
       }}
     >
-      {userDetails?.phone_number}
+      {userDetails?.phone_number || "Not provided"}
     </Text>
   </View>
 
@@ -521,6 +565,7 @@ const Profile = () => {
                     padding: 10,
                     fontSize: 16,
                   }}
+                  placeholder="Phone number"
                   value={editedUser?.phone_number ?? ""}
                   onChangeText={(text) =>
                     setEditedUser((prev) =>
@@ -552,6 +597,7 @@ const Profile = () => {
                     padding: 10,
                     fontSize: 16,
                   }}
+                  placeholder="Address"
                   value={editedUser?.address ?? ""}
                   onChangeText={(text) =>
                     setEditedUser((prev) =>
