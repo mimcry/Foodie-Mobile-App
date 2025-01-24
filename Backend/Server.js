@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const contactRouter = require("./routes/contactRoutes");
+const foodRouter = require("./routes/foodRoutes")
 // Check if the directory exists, if not create it
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath, { recursive: true });
@@ -37,6 +38,7 @@ app.use("/api", authRoutes);
 app.use("/api", weatherRoutes);
 app.use("/profile", profileRouter);
 app.use("/contactus", contactRouter);
+app.use("/fooddetails",foodRouter)
 // Refresh token route
 app.post("/refresh-token", async (req, res) => {
   console.log(req.body);
