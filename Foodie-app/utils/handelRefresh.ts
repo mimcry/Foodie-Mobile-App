@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { isLoggedInAtom } from '@/hooks/authAtom';
 import { router } from 'expo-router';
 import { ToastAndroid } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const useTokenExpiry = () => {
 
   const [_, setAuthenticated] = useAtom(isLoggedInAtom);
@@ -23,8 +24,8 @@ ToastAndroid.show("Session expired. Please log in again.",ToastAndroid.SHORT)
   // Handle refresh token request
   const handleRefresh = async () => {
     try {
-      const refresh_token = localStorage.getItem('refresh_token');
-      const response = await fetch('http://192.168.1.67:9002/refresh-token', {
+      const refresh_token = AsyncStorage.getItem("refreshToken")
+      const response = await fetch('http://192.168.1.67:8000/refresh-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

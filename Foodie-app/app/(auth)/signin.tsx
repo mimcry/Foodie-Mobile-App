@@ -17,7 +17,9 @@ import {
   refreshTokenAtom,
 } from "@/hooks/authAtom";
 import { useAtom } from "jotai";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+
 const SignIn = () => {
   const [isLoggedIn, setIsLoggedIn] = useAtom(isLoggedInAtom);
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -44,7 +46,10 @@ const SignIn = () => {
         const result = await response.json();
         setUserId(result.userId);
         setIsLoggedIn(true);
-
+        await AsyncStorage.setItem("isLoggedIn", "true");
+      await AsyncStorage.setItem("userId", String(result.userId));
+      await AsyncStorage.setItem("accessToken", String(result.accessToken)); 
+      await AsyncStorage.setItem("refreshToken", String(result.refreshToken)); 
         setAccessToken(result.accessToken);
 
         setRefreshToken(result.refreshToken);

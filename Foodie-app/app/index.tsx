@@ -1,13 +1,45 @@
-import { isLoggedInAtom } from "@/hooks/authAtom";
+import { useState, useEffect } from "react";
 import { Redirect } from "expo-router";
-import { useAtom } from "jotai";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
-  const [isLoggedIn] = useAtom(isLoggedInAtom); 
-  
+  const [isLoading, setIsLoading] = useState(true); // To handle async loading
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Login state
+  const [userData, setUserData] = useState(null); // To store user data
+
+  useEffect(() => {
+    const checkLoginState = async () => {
+      try {
+        const loginState = await AsyncStorage.getItem("isLoggedIn");
+        const userId = await AsyncStorage.getItem("userId");
+        const accessToken = await AsyncStorage.getItem("accessToken");
+
+        if (loginState === "true" && userId && accessToken) {
+          setIsLoggedIn(true);
+          setUserData({ userId, accessToken });
+        } else {
+          setIsLoggedIn(false);
+          setUserData(null); // If not logged in, reset user data
+        }
+      } catch (error) {
+        console.error("Error checking login state:", error);
+      } finally {
+        setIsLoading(false); // Mark loading as complete
+      }
+    };
+
+    checkLoginState();
+  }, []);
+
+  if (isLoading) {
+    return null; // Or loading spinner
+  }
+
   if (isLoggedIn) {
+    // User is logged in, redirect to home page
     return <Redirect href="/(tabs)/home" />;
   } else {
+    // User is not logged in, redirect to sign-in page
     return <Redirect href="/(auth)/signin" />;
   }
 }
