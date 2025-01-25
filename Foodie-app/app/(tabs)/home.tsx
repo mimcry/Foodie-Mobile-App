@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Alert,
 } from "react-native";
 
 
@@ -20,39 +21,53 @@ import { Tag } from "@/utils";
 import { FoodItem } from "@/utils";
 import Global from "@/components/global";
 import LottieView from 'lottie-react-native';
+import { getAccessToken } from "@/utils/access_Token";
 const Homepage: React.FC = () => {
   const navigation = useNavigation<any>(); // Adjust navigation type based on your navigation setup
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [filteredFoodItems, setFilteredFoodItems] = useState<FoodItem[]>([]);
   const [suggestions, setSuggestions] = useState<FoodItem[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<Tag[]>([
+    { id: 1, name: 'Pizza', image: require('@/image/pizzal.png') },
+    { id: 2, name: 'Burger', image: require('@/image/Breakfast.png') },
+    { id: 3, name: 'Fastfood', image: require('@/image/fastfood.png') },
+    { id: 4, name: 'Coffee', image: require('@/image/coffee.png') },
+    { id: 5, name: 'MoMo', image: require('@/image/momo.png') },
+    { id: 6, name: 'Noodles', image: require('@/image/noodles.png') },
+  ]);
+const fetchPopularFood = async () => {
+    try {
+      const access_token = await getAccessToken();
+      const response = await fetch(
+        `http://192.168.1.67:8000/fooddetails/menu`,
+        {
+          method: "GET",
+          headers: {
+            "content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setFoodItems(data);
+      
+      
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch popular food items.");
+      console.error("Failed to fetch popular food items:", error);
+   
+      
+    }
+  };
+  useEffect(()=>{
+    fetchPopularFood ()
+  },[])
 
-  // useEffect(() => {
-  //   fetchFoodData();
-  //   fetchTagData();
-  // }, []);
-
-  // const fetchFoodData = () => {
-  //   fetch("http://192.168.1.67:9002/food")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setFoodItems(data);
-  //       setFilteredFoodItems(data);
-  //     })
-  //     .catch((error) => console.error("Error fetching food data:", error));
-  // };
-  // console.log("fooditems", foodItems);
-  // console.log("filterdfood", filteredFoodItems);
-  // console.log("tags", tags);
-  // const fetchTagData = () => {
-  //   fetch("http://192.168.1.67:9002/tags")
-  //     .then((response) => response.json())
-  //     .then((data) => setTags(data))
-  //     .catch((error) => console.error("Error fetching tags:", error));
-  // };
-
-  const navigateToFood = (name: string, _id: string) => {
+   const navigateToFood = (name: string, _id: string) => {
     navigation.navigate("foodscreen", {
       selectedId: _id,
       selectedTagName: name,
@@ -63,20 +78,20 @@ const Homepage: React.FC = () => {
     navigation.navigate("fooddescription", {
       item,
       offer: item.offer,
-      offerPer: item.offerPer,
+      offerPer: item.offer,
     });
   };
 
   const handleSearch = (text: string) => {
+   
     setSearchQuery(text);
     if (text) {
       const filteredItems = foodItems.filter((item) =>
-        item.name.toLowerCase().includes(text.toLowerCase())
+        item.food_name.toLowerCase().includes(text.toLowerCase())
       );
       setFilteredFoodItems(filteredItems);
-
       const suggestionItems = foodItems.filter((item) =>
-        item.name.toLowerCase().includes(text.toLowerCase())
+        item.food_name.toLowerCase().includes(text.toLowerCase())
       );
       setSuggestions(suggestionItems);
     } else {
@@ -84,7 +99,7 @@ const Homepage: React.FC = () => {
       setSuggestions([]);
     }
   };
-
+  
   const clearSearch = () => {
     setSearchQuery("");
     setFilteredFoodItems(foodItems);
@@ -98,9 +113,9 @@ const Homepage: React.FC = () => {
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => navigateToFood(item.name, item._id)}>
+        <TouchableOpacity onPress={() => navigateToFood(item.name, item.id)}>
           <Image
-            source={{ uri: item.image }}
+            source={item.image}
             style={{ objectFit: "contain", width: 60, height: 60 }}
           />
           <Text style={{ alignSelf: "center" }}>
@@ -118,17 +133,17 @@ const Homepage: React.FC = () => {
         padding: 20,
         paddingBottom:10,
         
-        borderBottomWidth: 1,
+        borderBottomWidth: 0.5,
         borderBottomColor: "gray",
         flexDirection: "row",
         backgroundColor: "white",
       }}
     >
       <Image
-        source={{ uri: `${item.image}` }}
+        source={{ uri: `http://192.168.1.67:8000${item.image}` }}
         style={{ width: 100, height: 100, borderRadius: 20 }}
       />
-      {item.offer && (
+      {item.offer === 0  && (
         <View
           style={{
             position: "absolute",
@@ -141,21 +156,21 @@ const Homepage: React.FC = () => {
             marginLeft: 20,
           }}
         >
-          <Text style={{ color: "white" }}>{item.offerPer}% Off</Text>
+          <Text style={{ color: "white" }}>{item.offer}% Off</Text>
         </View>
       )}
       <View style={{ alignSelf: "center", marginLeft: 20, width: 230 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.name}</Text>
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.food_name}</Text>
         <Text style={{ fontSize: 14 }}>{item.description}</Text>
 
-        {item.offerPer ? (
+        {item.offer === 0 ? (
           <View style={{ flexDirection: "row" }}>
             <Text style={{ textDecorationLine: "line-through" }}>
               {" "}
               Rs.{item.price}
             </Text>
             <Text style={{ color: "green", marginLeft: 5 }}>
-              Rs.{item.price - (item.price * item.offerPer) / 100}
+              Rs.{item.price - (item.price * item.offer) / 100}
             </Text>
           </View>
         ) : (
@@ -168,13 +183,13 @@ const Homepage: React.FC = () => {
   const renderSuggestionItem = ({ item }: { item: FoodItem }) => (
     <TouchableOpacity
       style={{ padding: 10, flexDirection: "row", alignItems: "center" }}
-      onPress={() => handleSearch(item.name)}
+      onPress={() => handleSearch(item.food_name)}
     >
       <Image
-        source={{ uri: `${item.image}` }}
+        source={{ uri: `http://192.168.1.67:8000${item.image}` }}
         style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
       />
-      <Text>{item.name}</Text>
+      <Text>{item.food_name}</Text>
     </TouchableOpacity>
   );
 
@@ -245,22 +260,11 @@ const Homepage: React.FC = () => {
       </View>
       {searchQuery ? (
         <>
-          {/* {suggestions.length > 0 && (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderSuggestionItem}
-              style={{
-                backgroundColor: "#f7e3e1",
-                marginTop: 0,
-                borderRightWidth:0,marginHorizontal:20
-              }}
-            />
-          )} */}
+         
           {filteredFoodItems.length > 0 ? (
             <FlatList
               data={filteredFoodItems}
-              keyExtractor={(item) => item.name}
+              keyExtractor={(item) => item.food_name}
               renderItem={renderFoodItem}
               style={{ marginTop: "1%" }}
             />
@@ -323,9 +327,9 @@ const Homepage: React.FC = () => {
                 {renderTagSelection()}
               </View>
               <View style={{ marginHorizontal: 20 }}>
-                {/* <Featured_Food />
-                <Popular />
-                <OfferCard /> */}
+              <Featured_Food />
+                  <Popular />
+                 <OfferCard /> 
               </View>
             </>
           }

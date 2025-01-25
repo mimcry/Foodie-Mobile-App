@@ -290,7 +290,7 @@ setRefreshKey((prevKey) => prevKey + 1);
       borderRadius: 360,
     }}
   >
- {avatarUrl && avatarUri ?(   <Image
+ {avatarUrl || avatarUri ?(   <Image
    source={{ uri:`http://192.168.1.67:8000${avatarUrl||avatarUri}` }}
       style={{
         width: 100,

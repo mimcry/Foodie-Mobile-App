@@ -4,7 +4,7 @@ import { FoodTitle } from "../global";
 import { FoodCard } from "../global";
 import ipAddress from '../global'
 import { FoodCardProps } from "@/utils";
-
+import { getAccessToken } from "@/utils/access_Token";
 const FeaturedFood = () => {
   const [loading, setLoading] = useState(true);
   const [featuredFoods, setFeaturedFoods] = useState< FoodCardProps []>([]);
@@ -15,7 +15,13 @@ const FeaturedFood = () => {
 
   const fetchFoodItems = async () => {
     try {
-      const response = await fetch("http://192.168.1.67:9002/food");
+      const access_token =await getAccessToken();
+      const response = await fetch("http://192.168.1.67:8000/fooddetails/menu",{
+        method:"GET",
+        headers:{"Content-Type":"application/json",
+          Authorization: `Bearer ${access_token}`
+        }
+      });
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -26,6 +32,7 @@ const FeaturedFood = () => {
         .slice(0, 10); 
 
       setFeaturedFoods(featured);
+      console.log("Featured Foods:", featured);
       setLoading(false);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch food items data.");
@@ -51,13 +58,13 @@ const FeaturedFood = () => {
               <FoodCard
                 key={index}
                 image={item.image }
-                name={item.name}
+                food_name={item.food_name}
                 price={item.price}
                 description={item.description}
                 item={item}
-                id={item.id}
+                food_id={item.food_id}
                 offer={item.offer}
-                offerPer={item.offerPer}
+               tags={item.tags}
                 sides={item.sides}
                 drinks={item.drinks}
                 ingredients={item.ingredients}

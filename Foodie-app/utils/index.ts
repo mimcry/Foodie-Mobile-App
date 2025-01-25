@@ -1,24 +1,24 @@
 
 export interface FoodItem {
-    id: string;
+    food_id: string;
     image: string;
-    name: string;
+    food_name: string;
     price: number;
     description?: string;
-    offer?: boolean;
-    offerPer?: number;
+    offer?: number;
+   tags:string;
     sides?: string[];
     drinks?: string[];
     ingredients?: string[];
   }
 export interface FoodCardProps {
     image: string;
-    name: string;
+   food_name: string;
     price: number;
     description?: string;
-    id: string;
-    offer?: boolean;
-    offerPer?: number;
+    food_id: string;
+  tags:string;
+    offer?: number;
     sides?: string[];
     drinks?: string[];
     ingredients?: string[];
@@ -46,7 +46,7 @@ export interface FoodCardProps {
  
   
   export interface Tag {
-    _id: string;
+    id: number;
     name: string;
     image: string;
   }

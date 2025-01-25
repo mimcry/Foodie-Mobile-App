@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 const addFood = async (req, res) => {
   const { foodname, price, offer, description, tags } = req.body;
-
+  console.log("Request Body:", req.body);
 
   try {
 
@@ -52,85 +52,112 @@ const getFood= async (req,res)=>{
     }
 }
 const updateFood = async (req, res) => {
-    const { foodname, price, offer, description, tags } = req.body;
-    const { id } = req.params;
-    const image = req.file ? req.file.path : null; // Extract the image path if uploaded
-    console.log("Request Body:", req.body);
-    try {
-      // Check if the food item exists
-      const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
-      if (food.rows.length === 0) {
-        return res.status(404).json({ error: "Food not found" });
-      }
-  
-      // Log request body to ensure expected values are being received
-      
-  
-      // Build dynamic query to update fields that are provided
-      const queryFields = [];
-      const values = [];
-      let index = 1;
-  
-      if (foodname) {
-        queryFields.push(`food_name = $${index++}`);
-        values.push(foodname);
-      }
-      if (price) {
-        queryFields.push(`price = $${index++}`);
-        values.push(price);
-      }
-      if (offer) {
-        queryFields.push(`offer = $${index++}`);
-        values.push(offer);
-      }
-      if (description) {
-        queryFields.push(`description = $${index++}`);
-        values.push(description);
-      }
-      if (tags) {
-        queryFields.push(`tags = $${index++}`);
-        values.push(tags);
-      }
-      if (image) {
-        queryFields.push(`image = $${index++}`);
-        values.push(image);
-      }
-  
-      // Add updated_at field
-      queryFields.push(`updated_at = CURRENT_TIMESTAMP`);
-  
-      // Add the food id to the WHERE clause, and push it last in the values array
-      queryFields.push(`food_id = $${index}`);
-      values.push(id);
-  
-      // Log query and values for debugging
-      console.log("Generated Query:", queryFields.join(", "));
-      console.log("Values Array:", values);
-  
-      // Finalize the query
-      const query = `
-        UPDATE admin
-        SET ${queryFields.join(", ")}
-        WHERE food_id = $${index}
-        RETURNING *;
-      `;
-  
-      // Execute the query
-      const result = await pool.query(query, values);
-  
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Food update failed" });
-      }
-  
-      return res.json({
-        message: "Food updated successfully",
-        food: result.rows[0],
-      });
-    } catch (error) {
-      console.error("Error updating food:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
+  const { foodname, price, offer, description, tags } = req.body;
+  const { id } = req.params;
+
+  console.log("Request Body:", req.body);
+  if (!foodname) {
+    return res.status(400).json({ error: "Please provide the food name" });
+  }
+  if (!price) {
+    return res.status(400).json({ error: "Please provide the price" });
+  }
+  if (!offer) {
+    return res.status(400).json({ error: "Please provide an offer" });
+  }
+  if (!description) {
+    return res.status(400).json({ error: "Please provide a description" });
+  }
+  if (!tags) {
+    return res.status(400).json({ error: "Please provide tags" });
+  }
+
+  const image = req.file ? `/uploads/foodimage/${req.file.filename}` : null; 
+  try {
+   
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
+    if (food.rows.length === 0) {
+      return res.status(404).json({ error: "Food not found" });
     }
-  };
+   
+    // Build dynamic query to update fields that are provided
+    const queryFields = [];
+    const values = [];
+    let index = 1;
+    
+    if (foodname) {
+      queryFields.push(`food_name = $${index++}`);
+      values.push(foodname);
+    }
+  
+    if (price) {
+      queryFields.push(`price = $${index++}`);
+      values.push(price);
+    }
+    
+    if (offer) {
+      queryFields.push(`offer = $${index++}`);
+      values.push(offer);
+    }
+    if (description) {
+      queryFields.push(`description = $${index++}`);
+      values.push(description);
+    }
+    if (tags) {
+      queryFields.push(`tags = $${index++}`);
+      values.push(tags);
+    }
+    if (image) {
+      queryFields.push(`image = $${index++}`);
+      values.push(image);
+    }
+
+    // Add updated_at field for timestamp tracking
+    queryFields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    // Ensure the food ID is used in the WHERE clause
+    values.push(id);
+
+    // Finalize the query
+    const query = `
+      UPDATE admin
+      SET ${queryFields.join(", ")}
+      WHERE food_id = $${values.length}
+      RETURNING *;
+    `;
+
+    // Execute the query
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Food update failed" });
+    }
+
+    return res.json({
+      message: "Food updated successfully",
+      food: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating food:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const deleteFood= async (req,res)=>{
+  const {id}=req.params;
+  try{
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
+    if (food.rows.length === 0) {
+      return res.status(404).json({ error: "Food not found" });
+    }
+    const result = await pool.query("DELETE FROM admin WHERE food_id = $1", [id]);
+    return res.json({ message: "was deleted successfully" });
+  }
+  catch(error){
+    console.error("Error deleting food:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
   
   
-module.exports = { addFood,getFood,updateFood };
+module.exports = { addFood,getFood,updateFood,deleteFood };
