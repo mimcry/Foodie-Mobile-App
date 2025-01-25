@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, Alert } from "react-native";
 import { FoodCard, FoodTitle } from "../global";
-import ipAddress from '../global';
+import ipAddress from "../global";
 import { FoodItem } from "@/utils";
-
+import { getAccessToken } from "@/utils/access_Token";
 const Popular = () => {
   const [loading, setLoading] = useState(true);
   const [popularFoods, setPopularFoods] = useState<FoodItem[]>([]);
@@ -14,7 +14,17 @@ const Popular = () => {
 
   const fetchPopularFood = async () => {
     try {
-      const response = await fetch(`http://192.168.1.67:9002/popular-food`);
+      const access_token = await getAccessToken();
+      const response = await fetch(
+        `http://192.168.1.67:8000/fooddetails/menu`,
+        {
+          method: "GET",
+          headers: {
+            "content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -32,18 +42,22 @@ const Popular = () => {
   return (
     <View>
       <FoodTitle Topic="Popular" Title="Foods" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: "row", marginTop: "5%" }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ flexDirection: "row", marginTop: "5%" }}
+      >
         {popularFoods.map((item, index) => (
           <FoodCard
             key={index}
             image={item.image}
-            name={item.name}
+            food_name={item.food_name}
             price={item.price}
             item={item}
             description={item.description}
-            id={item.id}
+            food_id={item.food_id}
             offer={item.offer}
-            offerPer={item.offerPer}
+            tags={item.tags}
             sides={item.sides}
             drinks={item.drinks}
             ingredients={item.ingredients}

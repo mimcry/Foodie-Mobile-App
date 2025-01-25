@@ -177,7 +177,7 @@ setRefreshKey((prevKey) => prevKey + 1);
     {
       title: "Account Settings",
       items: [
-        { icon: "🔧", title: "Edit Profile" },
+        { icon: "🔧", title: "Edit Profile",route:"setIsEditing(true)" },
         { icon: "🔒", title: "Change Password" },
         { icon: "🔔", title: "Notifications" },
       ],
@@ -289,7 +289,7 @@ setRefreshKey((prevKey) => prevKey + 1);
       borderRadius: 360,
     }}
   >
- {avatarUrl && avatarUri ?(   <Image
+ {avatarUrl || avatarUri ?(   <Image
    source={{ uri:`http://192.168.1.67:8000${avatarUrl||avatarUri}` }}
       style={{
         width: 100,
@@ -434,7 +434,7 @@ setRefreshKey((prevKey) => prevKey + 1);
                 paddingVertical: 12,
                 paddingHorizontal: 15,
               }}
-              onPress={() => console.log(`Navigating to ${item.title}`)}
+              onPress={() => item?.route}
             >
               <Text
                 style={{
