@@ -4,6 +4,7 @@ const setProfile = async (req, res) => {
   const { id } = req.params;
   const { name, address, phone_number } = req.body;
   const { user } = req;
+  console.log("Request Body:", req.body);
 
   if (parseInt(id) !== user.id) {
     return res

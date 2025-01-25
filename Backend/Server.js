@@ -33,7 +33,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors());
 app.use(express.json()); // Parse JSON bodies
-app.use(bodyParser.json());
+
 app.use("/api", authRoutes);
 app.use("/api", weatherRoutes);
 app.use("/profile", profileRouter);

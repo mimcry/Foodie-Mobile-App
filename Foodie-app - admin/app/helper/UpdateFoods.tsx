@@ -75,24 +75,30 @@ useEffect(() => {
   };
   console.log("food id",foodDetails.food_id)
   const updateFood = async () => {
-    if (!foodDetails || !foodDetails.image) {
-      ToastAndroid.show("Please Select Food Image", ToastAndroid.SHORT);
+    if (!foodDetails) {
+      ToastAndroid.show("Food details are missing!", ToastAndroid.SHORT);
       return;
-    }
+    }  const formData = new FormData();
   
-    const formData = new FormData();
+    // Add food details
     formData.append("foodname", foodDetails.food_name);
     formData.append("price", foodDetails.price);
     formData.append("offer", foodDetails.offer);
     formData.append("description", foodDetails.description);
     formData.append("tags", foodDetails.tags);
-    formData.append("image", {
-      uri: foodDetails.image,
-      type: "image/jpeg", // Make sure the type matches the file
-      name: "foodimage.jpg", // Ensure the name is correct
-    });
-  
+     // Add image only if a new image has been selected
+     if (foodDetails.image.startsWith("file://")) {
+      formData.append("image", {
+        uri: foodDetails.image,
+        name: `image_${Date.now()}.jpg`,
+        type: "image/jpeg",
+      } as any);
+    }
+
     try {
+    
+  
+   
       const access_token = await getAccessToken();
       console.log("Access Token:", access_token);
       console.log("FormData content:", formData);
@@ -102,6 +108,7 @@ useEffect(() => {
         {
           method: "PUT",
           headers: {
+            
             Authorization: `Bearer ${access_token}`,
           },
           body: formData,
@@ -124,9 +131,10 @@ useEffect(() => {
       router.push("/home");
     } catch (error) {
       console.error("Network error:", error);
-      ToastAndroid.show(`Error: ${error}`, ToastAndroid.SHORT);
+      ToastAndroid.show(`Error: ${error.message}`, ToastAndroid.SHORT);
     }
   };
+  
   
   
   
