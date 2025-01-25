@@ -42,52 +42,54 @@ const UpdateFoods = () => {
     tags: "",
     image: "",
   });
-console.log("params",params)
-useEffect(() => {
-  if (params) {
-    setFoodDetails({
-      food_id: params.food_id as string,
-      food_name: params.food_name as string,
-      price: params.price as string,
-      offer: params.offer as string,
-      description: params.description as string,
-      tags: params.tags as string,
-      image: params.image as string,
-    });
-  }
-}, []);
-
+  const [loading, setIsLoading] = useState(false);
+  console.log("params", params);
+  useEffect(() => {
+    if (params) {
+      setFoodDetails({
+        food_id: params.food_id as string,
+        food_name: params.food_name as string,
+        price: params.price as string,
+        offer: params.offer as string,
+        description: params.description as string,
+        tags: params.tags as string,
+        image: params.image as string,
+      });
+    }
+  }, []);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+    
       quality: 1,
     });
 
     if (!result.canceled && foodDetails) {
       setFoodDetails({
         ...foodDetails,
-        image: result.assets[0].uri, 
+        image: result.assets[0].uri,
       });
     }
   };
-  console.log("food id",foodDetails.food_id)
+
   const updateFood = async () => {
+    setIsLoading(true);
     if (!foodDetails) {
       ToastAndroid.show("Food details are missing!", ToastAndroid.SHORT);
       return;
-    }  const formData = new FormData();
-  
+    }
+    const formData = new FormData();
+
     // Add food details
     formData.append("foodname", foodDetails.food_name);
     formData.append("price", foodDetails.price);
     formData.append("offer", foodDetails.offer);
     formData.append("description", foodDetails.description);
     formData.append("tags", foodDetails.tags);
-     // Add image only if a new image has been selected
-     if (foodDetails.image.startsWith("file://")) {
+    // Add image only if a new image has been selected
+    if (foodDetails.image.startsWith("file://")) {
       formData.append("image", {
         uri: foodDetails.image,
         name: `image_${Date.now()}.jpg`,
@@ -96,34 +98,33 @@ useEffect(() => {
     }
 
     try {
-    
-  
-   
       const access_token = await getAccessToken();
       console.log("Access Token:", access_token);
       console.log("FormData content:", formData);
-  
+
       const response = await fetch(
         `http://192.168.1.67:8000/fooddetails/${foodDetails.food_id}`,
         {
           method: "PUT",
           headers: {
-            
             Authorization: `Bearer ${access_token}`,
           },
           body: formData,
         }
       );
-  
+
       console.log("Response Status:", response.status);
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.log("Error Response:", errorData);
-        ToastAndroid.show(errorData.error || "Error occurred", ToastAndroid.SHORT);
+        ToastAndroid.show(
+          errorData.error || "Error occurred",
+          ToastAndroid.SHORT
+        );
         return;
       }
-  
+
       ToastAndroid.show(
         `${foodDetails.food_name} was updated successfully`,
         ToastAndroid.SHORT
@@ -131,13 +132,16 @@ useEffect(() => {
       router.push("/home");
     } catch (error) {
       console.error("Network error:", error);
-      ToastAndroid.show(`Error: ${error.message}`, ToastAndroid.SHORT);
+      ToastAndroid.show(`Error: ${error}`, ToastAndroid.SHORT);
+    }
+    finally{
+      setIsLoading(false)
     }
   };
-  
-  
-  
-  
+
+
+  console.log("food image", foodDetails?.image);
+
   if (!foodDetails) {
     return <Text>Loading...</Text>;
   }
@@ -168,7 +172,12 @@ useEffect(() => {
       >
         {foodDetails.image ? (
           <Image
-            source={{ uri: `http://192.168.1.67:8000${foodDetails.image}`  }}
+          source={{
+            uri: foodDetails.image.startsWith('file:///')
+              ? foodDetails.image
+              : `http://192.168.1.67:8000${foodDetails.image}`
+          }}
+          
             style={{
               width: "100%",
               height: "100%",
@@ -353,6 +362,7 @@ useEffect(() => {
           marginTop: 20,
         }}
         onPress={updateFood}
+        disabled={loading}
       >
         <Text
           style={{
@@ -360,8 +370,9 @@ useEffect(() => {
             fontSize: 18,
             fontWeight: "bold",
           }}
+
         >
-          Update Food
+          {loading?"Updating...":"Update Food"}
         </Text>
       </TouchableOpacity>
     </ScrollView>

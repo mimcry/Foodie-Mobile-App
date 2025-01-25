@@ -1,5 +1,6 @@
+import { getAccessToken } from "@/utils/access_Token";
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, ToastAndroid } from "react-native";
 
 interface FoodCardProps {
     food: {
@@ -16,13 +17,57 @@ interface FoodCardProps {
   }
 
 const FoodCard: React.FC<FoodCardProps> = ({ food, onEdit, onDelete }) => {
-  const handleDelete = () => {
+  const deleteFood = async () => {
+    
     Alert.alert(
-      "Delete Food",
-      `Are you sure you want to delete ${food.food_name}?`,
-     
+      "Delete Food Item",
+      `Are you sure you want to delete "${food.food_name}"?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              const access_token = await getAccessToken();
+              const response = await fetch(
+                `http://192.168.1.67:8000/fooddetails/${food.food_id}/delete`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${access_token}`,
+                  },
+                  body: JSON.stringify({ food_id: food.food_id }),
+                }
+              );
+              if (response.ok) {
+                const result = await response.json();
+                console.log("Delete Response:", result.message);
+                ToastAndroid.show(
+                  `${food.food_name} deleted successfully: ${result.message}`,
+                  ToastAndroid.SHORT
+                );
+                onDelete(food.food_id); // Callback to update parent state
+              } else {
+                console.error("Delete failed:", response.statusText);
+                ToastAndroid.show(
+                  `Delete failed: ${response.statusText}`,
+                  ToastAndroid.SHORT
+                );
+              }
+            } catch (error) {
+              console.error("Network error:", error);
+              ToastAndroid.show(`Error: ${error}`, ToastAndroid.SHORT);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
     );
   };
+ 
 
   return (
     <View style={styles.card}>
@@ -36,8 +81,8 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onEdit, onDelete }) => {
       <View style={styles.details}>
         <Text style={styles.foodName}>{food.food_name}</Text>
         <Text style={styles.description}>{food.description}</Text>
-        <Text style={styles.price}>Price: ₹{food.price}</Text>
-        <Text style={styles.offer}>Offer: {food.offer}</Text>
+        <Text style={styles.price}>Price: {food.price}</Text>
+        <Text style={styles.offer}>Offer: {food.offer}%</Text>
         <Text style={styles.tags}>Tags: {food.tags}</Text>
       </View>
 
@@ -46,7 +91,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onEdit, onDelete }) => {
         <TouchableOpacity style={styles.editButton} onPress={() => onEdit(food)}>
           <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+        <TouchableOpacity style={styles.deleteButton} onPress={deleteFood}>
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
       </View>

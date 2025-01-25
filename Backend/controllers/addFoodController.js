@@ -142,7 +142,22 @@ const updateFood = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const deleteFood= async (req,res)=>{
+  const {id}=req.params;
+  try{
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
+    if (food.rows.length === 0) {
+      return res.status(404).json({ error: "Food not found" });
+    }
+    const result = await pool.query("DELETE FROM admin WHERE food_id = $1", [id]);
+    return res.json({ message: "was deleted successfully" });
+  }
+  catch(error){
+    console.error("Error deleting food:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
 
   
   
-module.exports = { addFood,getFood,updateFood };
+module.exports = { addFood,getFood,updateFood,deleteFood };

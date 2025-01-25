@@ -10,35 +10,22 @@ const authRoutes = require("./routes/authRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const contactRouter = require("./routes/contactRoutes");
-const foodRouter = require("./routes/foodRoutes")
-// Check if the directory exists, if not create it
-if (!fs.existsSync(uploadsPath)) {
-  fs.mkdirSync(uploadsPath, { recursive: true });
-}
-require("dotenv").config();
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/avatars/"); // Save files in the 'uploads/avatars' folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Use a unique filename (timestamp)
-  },
-});
+const foodRouter = require("./routes/foodRoutes");
 
-// Initialize Multer
-const upload = multer({ storage: storage });
+require("dotenv").config();
+
 const app = express();
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors());
-app.use(express.json()); // Parse JSON bodies
+app.use(express.json());
 
 app.use("/api", authRoutes);
 app.use("/api", weatherRoutes);
 app.use("/profile", profileRouter);
 app.use("/contactus", contactRouter);
-app.use("/fooddetails",foodRouter)
+app.use("/fooddetails", foodRouter);
 // Refresh token route
 app.post("/refresh-token", async (req, res) => {
   console.log(req.body);
@@ -66,7 +53,6 @@ app.post("/refresh-token", async (req, res) => {
     res.status(403).json({ error: "Invalid or expired refresh token" });
   }
 });
-
 
 // Start the server
 const PORT = process.env.PORT || 8000;
