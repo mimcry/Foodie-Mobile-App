@@ -40,7 +40,7 @@ const fetchPopularFood = async () => {
     try {
       const access_token = await getAccessToken();
       const response = await fetch(
-        `http://192.168.1.67:8000/fooddetails/menu`,
+        `http://192.168.1.66:8000/fooddetails/menu`,
         {
           method: "GET",
           headers: {
@@ -140,7 +140,7 @@ const fetchPopularFood = async () => {
       }}
     >
       <Image
-        source={{ uri: `http://192.168.1.67:8000${item.image}` }}
+        source={{ uri: `http://192.168.1.66:8000${item.image}` }}
         style={{ width: 100, height: 100, borderRadius: 20 }}
       />
       {item.offer === 0  && (
@@ -186,7 +186,7 @@ const fetchPopularFood = async () => {
       onPress={() => handleSearch(item.food_name)}
     >
       <Image
-        source={{ uri: `http://192.168.1.67:8000${item.image}` }}
+        source={{ uri: `http://192.168.1.66:8000${item.image}` }}
         style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
       />
       <Text>{item.food_name}</Text>

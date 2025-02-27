@@ -13,7 +13,7 @@ import { useCart } from "react-use-cart";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FoodCardProps } from "@/utils";
-export const ipAddress = "http://192.168.1.67:9002";
+export const ipAddress = "http://192.168.1.66:9002";
 
 interface GlobalConfig {
   fontSize: {
@@ -126,7 +126,7 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
             }}
           >
             <Image
-              source={{ uri: `http://192.168.1.67:8000${props.image}` }}
+              source={{ uri: `http://192.168.1.66:8000${props.image}` }}
               style={{
                 width: 95,
                 height: 85,

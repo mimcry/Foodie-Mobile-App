@@ -33,7 +33,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onEdit, onDelete }) => {
             try {
               const access_token = await getAccessToken();
               const response = await fetch(
-                `http://192.168.1.67:8000/fooddetails/${food.food_id}/delete`,
+                `http://192.168.1.66:8000/fooddetails/${food.food_id}/delete`,
                 {
                   method: "DELETE",
                   headers: {
@@ -73,7 +73,7 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onEdit, onDelete }) => {
     <View style={styles.card}>
       {/* Food Image */}
       <Image
-        source={{ uri: `http://192.168.1.67:8000${food.image}`|| "https://via.placeholder.com/150" }}
+        source={{ uri: `http://192.168.1.66:8000${food.image}`|| "https://via.placeholder.com/150" }}
         style={styles.image}
       />
 

@@ -35,7 +35,7 @@ const SignIn = () => {
       password: password,
     };
     try {
-      const response = await fetch("http://192.168.1.67:8000/api/login", {
+      const response = await fetch("http://192.168.1.66:8000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
