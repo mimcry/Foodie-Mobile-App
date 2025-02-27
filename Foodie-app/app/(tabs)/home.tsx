@@ -22,6 +22,7 @@ import { FoodItem } from "@/utils";
 import Global from "@/components/global";
 import LottieView from 'lottie-react-native';
 import { getAccessToken } from "@/utils/access_Token";
+
 const Homepage: React.FC = () => {
   const navigation = useNavigation<any>(); // Adjust navigation type based on your navigation setup
   const [searchQuery, setSearchQuery] = useState<string>("");

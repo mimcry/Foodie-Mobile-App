@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FoodCardProps } from "@/utils";
 export const ipAddress = "http://192.168.1.66:9002";
-
+import { router } from "expo-router";
 interface GlobalConfig {
   fontSize: {
     large: number;
@@ -95,11 +95,12 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
   const navigation = useNavigation<NativeStackNavigationProp<any, any>>();
 
   const onPressItem = () => {
-    navigation.navigate("fooddescription", {
-      item: props,
-      id: props.food_id,
-
-      offer: props.offer,
+    router.push({
+      pathname: "/(food_description)/food_description",
+      params: {
+        item: JSON.stringify(props),
+        
+      },
     });
   };
 
