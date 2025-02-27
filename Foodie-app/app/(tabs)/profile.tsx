@@ -98,7 +98,7 @@ setRefreshKey((prevKey) => prevKey + 1);
   if(!access_token){
     console.log("No token found. Please log in again.");
   }
-        const response = await fetch(`http://192.168.1.67:8000/profile/${id}/avatar`, {
+        const response = await fetch(`http://192.168.1.66:8000/profile/${id}/avatar`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -136,7 +136,7 @@ setRefreshKey((prevKey) => prevKey + 1);
 
     try {
       
-      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+      const response = await fetch(`http://192.168.1.66:8000/profile/${id}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${access_token}` },
       });
@@ -208,7 +208,7 @@ setRefreshKey((prevKey) => prevKey + 1);
     try {
       const access_token =await  getAccessToken();
       const id = await userId();
-      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+      const response = await fetch(`http://192.168.1.66:8000/profile/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -290,7 +290,7 @@ setRefreshKey((prevKey) => prevKey + 1);
     }}
   >
  {avatarUrl || avatarUri ?(   <Image
-   source={{ uri:`http://192.168.1.67:8000${avatarUrl||avatarUri}` }}
+   source={{ uri:`http://192.168.1.66:8000${avatarUrl||avatarUri}` }}
       style={{
         width: 100,
         height: 100,
