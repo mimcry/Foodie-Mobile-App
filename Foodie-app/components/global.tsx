@@ -13,8 +13,8 @@ import { useCart } from "react-use-cart";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FoodCardProps } from "@/utils";
-export const ipAddress = "http://192.168.1.67:9002";
-
+export const ipAddress = "http://192.168.1.66:9002";
+import { router } from "expo-router";
 interface GlobalConfig {
   fontSize: {
     large: number;
@@ -46,7 +46,10 @@ interface GlobalButtonProps {
   name: string;
 }
 
-export const GlobalButton: React.FC<GlobalButtonProps> = ({ onPress, name }) => {
+export const GlobalButton: React.FC<GlobalButtonProps> = ({
+  onPress,
+  name,
+}) => {
   return (
     <View>
       <Button
@@ -88,18 +91,16 @@ export const FoodTitle: React.FC<FoodTitleProps> = ({ Topic, Title }) => {
   );
 };
 
-
-
 export const FoodCard: React.FC<FoodCardProps> = (props) => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<any, any>>();
+  const navigation = useNavigation<NativeStackNavigationProp<any, any>>();
 
   const onPressItem = () => {
-    navigation.navigate("fooddescription", {
-      item: props,
-      id: props.id,
-      offerPer: props.offerPer,
-      offer: props.offer,
+    router.push({
+      pathname: "/(food_description)/food_description",
+      params: {
+        item: JSON.stringify(props),
+        
+      },
     });
   };
 
@@ -126,7 +127,7 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
             }}
           >
             <Image
-              source={{ uri: `${props.image}` }}
+              source={{ uri: `http://192.168.1.66:8000${props.image}` }}
               style={{
                 width: 95,
                 height: 85,
@@ -134,7 +135,7 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
                 borderRadius: 25,
               }}
             />
-            {props.offer && (
+            {props.offer == 0 ? null : (
               <View
                 style={{
                   position: "absolute",
@@ -145,7 +146,7 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
                   borderRadius: 5,
                 }}
               >
-                <Text style={{ color: "white" }}> {props.offerPer}% Off</Text>
+                <Text style={{ color: "white" }}> {props.offer}% Off</Text>
               </View>
             )}
             <TouchableOpacity activeOpacity={0.5} onPress={onPressItem}>
@@ -169,18 +170,19 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
               />
             </TouchableOpacity>
           </View>
-          <Text>{props.name}</Text>
-          {props.offerPer ? (
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ textDecorationLine: "line-through" }}>
-                Rs.{props.price}
-              </Text>
-              <Text style={{ color: "green", marginLeft: "auto" }}>
-                Rs.{props.price - (props.price * props.offerPer) / 100}
-              </Text>
-            </View>
+          <Text>{props.food_name}</Text>
+          {props.offer ==0 ? (
+                <Text style={{ color: "green" }}>Rs. {props.price}</Text>
           ) : (
-            <Text style={{ color: "green" }}>Rs. {props.price}</Text>
+       
+            <View style={{ flexDirection: "row" }}>
+            <Text style={{ textDecorationLine: "line-through" }}>
+              Rs.{props.price}
+            </Text>
+            <Text style={{ color: "green", marginLeft: "auto" }}>
+              Rs.{props.price - (props.price * props.offer) / 100}
+            </Text>
+          </View>
           )}
         </TouchableOpacity>
       </View>
@@ -209,10 +211,16 @@ export const Alert: React.FC<AlertProps> = ({
             item?
           </Text>
           <View style={styles.modalButtons}>
-            <TouchableOpacity style={{ flex: 1, marginHorizontal: 5 }} onPress={onCancel}>
+            <TouchableOpacity
+              style={{ flex: 1, marginHorizontal: 5 }}
+              onPress={onCancel}
+            >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ flex: 1, marginHorizontal: 5 }} onPress={onConfirm}>
+            <TouchableOpacity
+              style={{ flex: 1, marginHorizontal: 5 }}
+              onPress={onConfirm}
+            >
               <Text style={styles.confirmText}>OK</Text>
             </TouchableOpacity>
           </View>
