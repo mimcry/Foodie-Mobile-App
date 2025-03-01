@@ -3,14 +3,15 @@ import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Animated }
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-
-const FoodDescriptionScreen = ({ route, navigation }) => {
+import { useDispatch } from "react-redux";
+import { addToCart } from '@/redux/cartSlice';
+const FoodDescriptionScreen = () => {
 
 
   const params = useLocalSearchParams();
   console.log("params ",params )
-  const item = params.item ? JSON.parse(params.item) : null;
-  const [quantity, setQuantity] = useState(1);
+  const item = typeof params.item === 'string' ? JSON.parse(params.item) : null;
+  const [quantity, setQuantity] = useState(2);
   const [favorite, setFavorite] = useState(false);
   const scrollY = new Animated.Value(0);
 
@@ -22,7 +23,17 @@ const FoodDescriptionScreen = ({ route, navigation }) => {
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
-
+const dispatch= useDispatch();
+const handleAddCart =(item:any)=>{
+  dispatch(addToCart({
+    id: item.food_id,
+    name: item.food_name,
+    price: item.price,
+    image:item.image,
+    description:item.description,
+    quantity: 2,
+  }))
+}
   return (
     <SafeAreaView style={styles.container}>
       {/* Animated Header */}
@@ -128,7 +139,7 @@ const FoodDescriptionScreen = ({ route, navigation }) => {
 
       {/* Add to Cart Button */}
       <View style={styles.addToCartContainer}>
-        <TouchableOpacity style={styles.addToCartButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.addToCartButton} onPress={() => handleAddCart(item)}>
           <Text style={styles.addToCartText}>Add to Cart - ${(item.price * quantity).toFixed(2)}</Text>
         </TouchableOpacity>
       </View>

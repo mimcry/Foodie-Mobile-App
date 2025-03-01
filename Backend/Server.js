@@ -11,7 +11,7 @@ const weatherRoutes = require("./routes/weatherRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const contactRouter = require("./routes/contactRoutes");
 const foodRouter = require("./routes/foodRoutes");
-
+const orderitemdRouter=require("./routes/orderItemsRoutes")
 require("dotenv").config();
 
 const app = express();
@@ -26,6 +26,7 @@ app.use("/api", weatherRoutes);
 app.use("/profile", profileRouter);
 app.use("/contactus", contactRouter);
 app.use("/fooddetails", foodRouter);
+app.use("/",orderitemdRouter)
 // Refresh token route
 app.post("/refresh-token", async (req, res) => {
   console.log(req.body);

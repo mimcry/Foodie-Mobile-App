@@ -50,3 +50,21 @@ export interface FoodCardProps {
     name: string;
     image: string;
   }
+  export type OrderItem = {
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+    image: string;
+    restaurant: string;
+  };
+  export type Order = {
+    id: string;
+    orderNumber: string;
+    date: string;
+    time: string;
+    status: string;
+    total: number;
+    items: OrderItem[];
+  };
+    

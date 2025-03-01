@@ -5,7 +5,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
+import { Provider } from "react-redux";
+import CartScreen from './(tabs)/cart';
+import { store } from '@/redux/store';
+import { ToastProvider } from 'react-native-toast-notifications';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -32,12 +35,16 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DefaultTheme}>
+      <ToastProvider placement="top"
+      offsetTop={30} 
+      duration={3000}>
+      <Provider store={store}>
       <Stack>
         <Stack.Screen name='(auth)' options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(food_description)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
-      </Stack>
+      </Stack></Provider></ToastProvider>
       <StatusBar style="dark" />
     </ThemeProvider>
   );

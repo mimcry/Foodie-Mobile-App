@@ -19,7 +19,8 @@ import { getAccessToken } from "@/utils/access_Token";
 import { FoodItem } from "@/utils";
 import Index from "..";
 import { router } from "expo-router";
-
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/redux/cartSlice";
 const { width } = Dimensions.get("window");
 
 const Menu = () => {
@@ -130,9 +131,18 @@ const Menu = () => {
       );
     }
   };
-
-  const addToCart = () => {
-    setCartCount((prevCount) => prevCount + 1);
+  const dispatch = useDispatch();
+  const handleAddToCart = (item: any) => {
+    dispatch(
+      addToCart({
+        id: item.food_id,
+        name: item.food_name,
+        price: item.price,
+        image:item.image,
+        description:item.description,
+        quantity: 1,
+      })
+    );
   };
 
   const categories = [
@@ -166,10 +176,14 @@ const Menu = () => {
           }}
         >
           <Ionicons name="search-outline" size={20} color="red" />
-          {searchQuery &&<TouchableOpacity style={{ marginLeft: "auto" }} onPress={()=>setSearchQuery("")}>
-            <Ionicons name="close-circle-outline" size={22} color="red" />
-          </TouchableOpacity>}
-          
+          {searchQuery && (
+            <TouchableOpacity
+              style={{ marginLeft: "auto" }}
+              onPress={() => setSearchQuery("")}
+            >
+              <Ionicons name="close-circle-outline" size={22} color="red" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <TextInput
@@ -311,15 +325,17 @@ const Menu = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={()=>{
-            router.push({
-              pathname:"/(food_description)/food_description",
-              params:{
-                item:JSON.stringify(item),
-               
-              }
-            })
-          }}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              router.push({
+                pathname: "/(food_description)/food_description",
+                params: {
+                  item: JSON.stringify(item),
+                },
+              });
+            }}
+          >
             <Image
               source={{ uri: `http://192.168.1.66:8000${item.image}` }}
               style={styles.image}
@@ -343,7 +359,10 @@ const Menu = () => {
               </View>
               <View style={styles.priceRow}>
                 <Text style={styles.price}>Rs{item.price}</Text>
-                <TouchableOpacity style={styles.addButton} onPress={addToCart}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => handleAddToCart(item)}
+                >
                   <Ionicons name="add" size={20} color="#fff" />
                 </TouchableOpacity>
               </View>
