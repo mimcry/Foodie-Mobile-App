@@ -35,14 +35,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DefaultTheme}>
-      <ToastProvider placement="top"
-      offsetTop={30} 
+      <ToastProvider placement="bottom"
+      offsetBottom={50} 
       duration={3000}>
       <Provider store={store}>
       <Stack>
         <Stack.Screen name='(auth)' options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(food_description)" options={{ headerShown: false }} />
+        <Stack.Screen name="(searchpage)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack></Provider></ToastProvider>
       <StatusBar style="dark" />

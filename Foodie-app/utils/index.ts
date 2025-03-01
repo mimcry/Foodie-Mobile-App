@@ -10,6 +10,10 @@ export interface FoodItem {
     sides?: string[];
     drinks?: string[];
     ingredients?: string[];
+    averageRating?:string
+    reviewsCount?:string;
+    duration?:string;
+    calories?:string
   }
 export interface FoodCardProps {
     image: string;
@@ -26,6 +30,10 @@ export interface FoodCardProps {
     sidesprice?:string[];
     drinkprice?:string[];
     onPress?: () => void;
+    averageRating?:string
+    reviewsCount?:string;
+    duration?:string;
+    calories?:string
   }
   export interface OfferFoodProps{
     image: string;
@@ -42,6 +50,10 @@ export interface FoodCardProps {
     drinkprice?:string[];
     item: FoodItem; 
     onPress?:()=>void;
+    averageRating?:string
+    reviewsCount?:string;
+    duration?:string;
+    calories?:string
   }
  
   

@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAccessToken } from "@/utils/access_Token";
 import { FoodItem } from "@/utils";
 import Index from "..";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/cartSlice";
 const { width } = Dimensions.get("window");
@@ -32,7 +32,9 @@ const Menu = () => {
   const [selectedFilter, setSelectedFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const params = useLocalSearchParams();
   const fetchFoodItems = async () => {
+    setLoading(true);
     try {
       const access_token = await getAccessToken();
       const response = await fetch(
@@ -45,29 +47,64 @@ const Menu = () => {
           },
         }
       );
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
+
       const data = await response.json();
 
-      setFoods(data);
-      console.log("Featured Foods:", data);
-      setLoading(false);
+      if (Array.isArray(data)) {
+        setFoods(data);
+        console.log("Menu Foods:", data);
+      } else {
+        throw new Error("Invalid data format: Expected an array");
+      }
     } catch (error) {
       Alert.alert("Error", "Failed to fetch food items data.");
       console.error("Failed to fetch food items data:", error);
+    } finally {
       setLoading(false);
     }
   };
+
+  // Handle tag parameter from home page navigation
+  useEffect(() => {
+    if (params.params && Foods.length > 0) {
+      console.log("Applying tag filter from home page:", params.params);
+      setSelectedTag(params.params.toString());
+      // The filterData effect will handle the actual filtering
+    }
+  }, [params.params, Foods.length]);
+
+  // Fetch data on component mount
   useEffect(() => {
     fetchFoodItems();
   }, []);
 
+  // Initialize filteredData with all Foods once loaded
+  useEffect(() => {
+    if (Foods.length > 0) {
+      // Only initialize if no filters are active
+      if (!selectedTag && selectedPrice === null && searchQuery === "") {
+        setFilteredData(Foods);
+      } else {
+        // Otherwise, apply existing filters to the new data
+        filterData();
+      }
+    }
+  }, [Foods]);
+
   const filterData = () => {
-    let updatedData = Foods;
+    if (Foods.length === 0) return;
+
+    let updatedData = [...Foods];
 
     if (selectedTag) {
       updatedData = updatedData.filter((item) => item.tags === selectedTag);
+    }
+    if (selectedTag == "All") {
+      updatedData = [...Foods];
     }
 
     if (selectedPrice !== null) {
@@ -83,54 +120,22 @@ const Menu = () => {
     setFilteredData(updatedData);
   };
 
+  // Apply filters whenever a filter criteria changes
   useEffect(() => {
     filterData();
-  }, [selectedTag, selectedPrice, searchQuery, Foods]);
+  }, [selectedTag, selectedPrice, searchQuery]);
 
+  // Filter functions that update state
   const filterByTag = (tags) => {
     setSelectedTag(tags);
-    if (!tags) {
-      // If no tag is selected (All), reset to the current price filter if any
-      setFilteredData(
-        selectedPrice
-          ? Foods.filter((item) => item.price <= selectedPrice)
-          : Foods
-      );
-    } else {
-      // Apply both tag and price filter if price filter is active
-      setFilteredData(
-        Foods.filter((item) => {
-          const matchesTag = item.tags === tags;
-
-          const matchesPrice = selectedPrice
-            ? item.price <= selectedPrice
-            : true;
-          return matchesTag && matchesPrice;
-        })
-      );
-    }
+    // filterData will be triggered by the useEffect
   };
-  useEffect(() => {
-    setFilteredData(Foods);
-  }, [Foods]);
+
   const filterByPrice = (priceLimit) => {
     setSelectedPrice(priceLimit);
-    if (!priceLimit) {
-      // If no price limit (All Prices), reset to the current tag filter if any
-      setFilteredData(
-        selectedTag ? Foods.filter((item) => item.tags === selectedTag) : Foods
-      );
-    } else {
-      // Apply both tag and price filter if tag filter is active
-      setFilteredData(
-        Foods.filter((item) => {
-          const matchesPrice = item.price <= priceLimit;
-          const matchesTag = selectedTag ? item.tags === selectedTag : true;
-          return matchesPrice && matchesTag;
-        })
-      );
-    }
+    // filterData will be triggered by the useEffect
   };
+
   const dispatch = useDispatch();
   const handleAddToCart = (item: any) => {
     dispatch(
@@ -138,28 +143,14 @@ const Menu = () => {
         id: item.food_id,
         name: item.food_name,
         price: item.price,
-        image:item.image,
-        description:item.description,
+        image: item.image,
+        description: item.description,
         quantity: 1,
       })
     );
   };
 
-  const categories = [
-    "All",
-    "Pizza",
-    "Burger",
-    "Breakfast",
-    "Desserts",
-    "Drinks",
-  ];
-  const { width } = Dimensions.get("window");
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const headerWidth = scrollY.interpolate({
-    inputRange: [0, 150], // Scroll range
-    outputRange: [width, 100], // Full width to a small fixed width
-    extrapolate: "clamp",
-  });
+  const categories = ["All", "Pizza", "Burger", "Vegan", "Dessert", "Drinks"];
   return (
     <SafeAreaView style={styles.container}>
       {/* Search Bar */}
@@ -315,7 +306,7 @@ const Menu = () => {
 
       {/* Main Menu */}
       <Text style={styles.sectionTitle}>
-        {selectedTag || selectedPrice ? "Filtered Results" : "All Items"} (
+        {selectedTag || selectedPrice ? `${selectedTag}` : "All Items"} (
         {filteredData.length})
       </Text>
 
@@ -336,34 +327,47 @@ const Menu = () => {
               });
             }}
           >
-            <Image
-              source={{ uri: `http://192.168.1.66:8000${item.image}` }}
-              style={styles.image}
-            />
-            <View style={styles.offerBadge}>
-              <Text style={styles.offerText}>{item.offer}% off</Text>
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: `http://192.168.1.66:8000${item.image}` }}
+                style={styles.image}
+              />
+              {item.offer > 0 && (
+                <View style={styles.offerBadge}>
+                  <Text style={styles.offerText}>{item.offer}% OFF</Text>
+                </View>
+              )}
             </View>
-            <View style={styles.textContainer}>
+
+            <View style={styles.contentContainer}>
               <View style={styles.nameRow}>
                 <Text style={styles.name} numberOfLines={1}>
-                  {item.food_name}{" "}
+                  {item.food_name}
                 </Text>
                 <View style={styles.ratingContainer}>
                   <Ionicons name="star" size={14} color="#FFD700" />
-                  <Text style={styles.ratingText}>4.2</Text>
+                  <Text style={styles.ratingText}>{item.averageRating}</Text>
                 </View>
               </View>
-              {/* <Text style={styles.tagText}>{item.tags}</Text> */}
-              <View style={styles.timeContainer}>
-                <Text style={styles.timeText}>{item.description}</Text>
-              </View>
-              <View style={styles.priceRow}>
-                <Text style={styles.price}>Rs{item.price}</Text>
+
+              <Text style={styles.description} numberOfLines={2}>
+                {item.description}
+              </Text>
+
+              <View style={styles.bottomRow}>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.priceLabel}>Rs</Text>
+                  <Text style={styles.price}>{item.price}</Text>
+                </View>
+
                 <TouchableOpacity
                   style={styles.addButton}
-                  onPress={() => handleAddToCart(item)}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleAddToCart(item);
+                  }}
                 >
-                  <Ionicons name="add" size={20} color="#fff" />
+                  <Ionicons name="add" size={18} color="#fff" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -589,68 +593,112 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   card: {
-    flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: 16,
+    overflow: "hidden",
+    marginVertical: 8,
+    marginHorizontal: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowRadius: 8,
     elevation: 3,
-    marginBottom: 16,
-    overflow: "hidden",
+  },
+  imageContainer: {
     position: "relative",
+    height: 160,
   },
   image: {
-    width: 100,
-    height: 100,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   offerBadge: {
     position: "absolute",
-    top: 8,
-    left: 8,
-    backgroundColor: "#df2020",
-    paddingHorizontal: 8,
+    top: 12,
+    left: 12,
+    backgroundColor: "#FF3B30",
     paddingVertical: 4,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
   offerText: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "bold",
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
   },
-  textContainer: {
-    flex: 1,
-    padding: 12,
-    justifyContent: "space-between",
+  contentContainer: {
+    padding: 16,
   },
   nameRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 8,
   },
   name: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
+    fontWeight: "700",
     flex: 1,
+    color: "#333",
   },
   ratingContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#FFF9E6",
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: 8,
+    marginLeft: 8,
   },
   ratingText: {
     fontSize: 12,
-    fontWeight: "bold",
-    color: "#555",
+    fontWeight: "600",
+    color: "#333",
     marginLeft: 2,
   },
+  description: {
+    fontSize: 13,
+    color: "#666",
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  priceLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginRight: 2,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  addButton: {
+    backgroundColor: "#4CAF50",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  textContainer: {
+    flex: 1,
+    padding: 12,
+    justifyContent: "space-between",
+  },
+
   tagText: {
     fontSize: 12,
     color: "#666",
@@ -671,19 +719,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 8,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#df2020",
-  },
-  addButton: {
-    backgroundColor: "#df2020",
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
   },
   emptyContainer: {
     alignItems: "center",

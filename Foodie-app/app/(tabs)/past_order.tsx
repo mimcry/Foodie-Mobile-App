@@ -106,68 +106,68 @@ const PastOrdersScreen = () => {
     }
   };
 
-  // Rating functionality
+  
   const openRatingModal = (order) => {
     setCurrentOrderToRate(order);
     setRating(0);
     setFeedback("");
     setRatingModalVisible(true);
   };
-
-  const submitRating = async () => {
+  
+  
+  const submitRating = async (orderItems) => {
+  
+  
     if (!currentOrderToRate) return;
-    
+  
     try {
       const userId = await AsyncStorage.getItem("userId");
       const access_token = await AsyncStorage.getItem("accessToken");
-      
-      // In a real app, you would send this rating to your backend
-      console.log("Submitting rating:", {
-        orderId: currentOrderToRate.order_id,
-        userId: userId,
-        rating: rating,
-        feedback: feedback
-      });
-      
-      // Example API call (uncomment and modify as needed)
-      /*
-      const response = await fetch(
-        `http://192.168.1.66:8000/ratings`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            orderId: currentOrderToRate.order_id,
-            userId: userId,
-            rating: rating,
-            feedback: feedback
-          })
+  
+    
+      orderItems.forEach(async (item) => {
+        const foodItemId = item.food_item_id; 
+        const response = await fetch(
+          `http://192.168.1.66:8000/fooddetails/foodratings`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+              "Content-Type": "application/json",
+              
+            },
+            body: JSON.stringify({
+              food_id: foodItemId, 
+              user_id: userId,
+              rating: rating,
+              review: feedback
+            })
+          }
+        );
+  console.log("food response",{ foodId: foodItemId,
+    userId: userId,
+    rating: rating,
+    feedback: feedback})
+        if (!response.ok) {
+          throw new Error(`Failed to submit rating: ${response.status}`);
         }
-      );
-      
-      if (!response.ok) {
-        throw new Error(`Failed to submit rating: ${response.status}`);
-      }
-      */
-      
-      // Show success message
-      toast.show("Thank you for your rating!", {
-        type: "success",
-        animationType: "slide-in",
-        style: {
-          borderRadius: 20,
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-        },
+  
+        // Show success message
+        toast.show("Thank you for your rating!", {
+          type: "success",
+          animationType: "slide-in",
+          style: {
+            borderRadius: 20,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+          },
+         
+        });
+  
+        // Close the modal after submitting the rating
+        setRatingModalVisible(false);
       });
-      
-      // Close the modal
-      setRatingModalVisible(false);
-      
+  
     } catch (error) {
       console.error("Error submitting rating:", error);
       toast.show("Failed to submit rating. Please try again.", {
@@ -181,7 +181,7 @@ const PastOrdersScreen = () => {
       });
     }
   };
-
+  
  
   const renderOrderItem = ({ item: order }) => {
     const isExpanded = expandedOrderId === order.order_id;
@@ -400,7 +400,8 @@ const PastOrdersScreen = () => {
                 styles.submitButton,
                 rating === 0 && styles.submitButtonDisabled
               ]}
-              onPress={submitRating}
+              onPress={() => currentOrderToRate && submitRating(currentOrderToRate.items)}
+
               disabled={rating === 0}
             >
               <Text style={styles.submitButtonText}>Submit Rating</Text>

@@ -64,7 +64,6 @@ const getorderitems = async (req, res) => {
 
       const { rows } = await pool.query(query, [id]);
 
-      console.log("Raw query result:", rows);
 
       if (rows.length === 0) {
           console.log("No orders found for this user");
@@ -94,7 +93,7 @@ const getorderitems = async (req, res) => {
           });
       });
 
-      console.log("Processed order details:", JSON.stringify(Object.values(orders), null, 2));
+ 
 
       res.json({ orders: Object.values(orders) });
 

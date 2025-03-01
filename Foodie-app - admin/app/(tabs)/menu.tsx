@@ -16,7 +16,7 @@ import {
   Tag,
   FileText,
   Hash,
-  ImagePlus,
+  ImagePlus,Clock,Flame
 } from "lucide-react-native";
 import { getAccessToken } from "@/utils/access_Token";
 import { userId } from "@/utils/id";
@@ -25,21 +25,22 @@ const Menu = () => {
   const [price, setPrice] = useState("");
   const [offer, setOffer] = useState("");
   const [description, setDescription] = useState("");
+  const[calories,setcalories]=useState("")
+  const[duration,setduration]=useState("")
   const [tags, setTags] = useState<string[]>([]);
   const [foodImage, setFoodImage] = useState<string | null>(null);
   const predefinedTags = [
     "Pizza",
     "Burger",
-    "Fast Food",
-    "Coffee",
     "Vegan",
-    "Spicy",
-  ];
+    "Desert",
+    "Drinks",
+      ];
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      
       quality: 1,
     });
 
@@ -55,6 +56,8 @@ const Menu = () => {
     formData.append("price", price);
     formData.append("offer", offer);
     formData.append("description", description);
+    formData.append("calories", calories);
+    formData.append("duration", duration);
     formData.append("tags", tags.join(", "));
     formData.append("image", {
       uri: foodImage,
@@ -89,6 +92,8 @@ const Menu = () => {
         setDescription("");
         setOffer("");
         setTags("");
+        setcalories("");
+        setduration("");
         setFoodImage(null);
       } else {
         const errorData = await response.json();
@@ -262,6 +267,58 @@ const Menu = () => {
           placeholder="Enter food Description (e.g.,momo with extra jhol)"
           value={description}
           onChangeText={setDescription}
+        />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
+          borderWidth: 1,
+          borderColor: "#df2020",
+          borderRadius: 8,
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          marginVertical: 10,
+        }}
+      >
+        <Clock size={20} color="#df2020" />
+        <TextInput
+          style={{
+            flex: 1,
+            marginLeft: 10,
+            fontSize: 16,
+            color: "#333",
+          }}
+          placeholder="Enter food prepration time eg. 15-20"
+          value={duration}
+          onChangeText={setduration}
+        />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
+          borderWidth: 1,
+          borderColor: "#df2020",
+          borderRadius: 8,
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          marginVertical: 10,
+        }}
+      >
+        <Flame size={20} color="#df2020" />
+        <TextInput
+          style={{
+            flex: 1,
+            marginLeft: 10,
+            fontSize: 16,
+            color: "#333",
+          }}
+          placeholder="Enter the calories like 400"
+          value={calories}
+          onChangeText={setcalories}
         />
       </View>
 
