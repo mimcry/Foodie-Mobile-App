@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAccessToken } from "@/utils/access_Token";
 import { FoodItem } from "@/utils";
 import Index from "..";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -310,7 +311,15 @@ const Menu = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity style={styles.card} onPress={()=>{
+            router.push({
+              pathname:"/(food_description)/food_description",
+              params:{
+                item:JSON.stringify(item),
+               
+              }
+            })
+          }}>
             <Image
               source={{ uri: `http://192.168.1.66:8000${item.image}` }}
               style={styles.image}
@@ -339,7 +348,7 @@ const Menu = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>

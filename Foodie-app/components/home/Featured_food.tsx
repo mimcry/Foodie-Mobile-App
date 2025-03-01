@@ -5,7 +5,9 @@ import { FoodCard } from "../global";
 import ipAddress from '../global'
 import { FoodCardProps } from "@/utils";
 import { getAccessToken } from "@/utils/access_Token";
+
 const FeaturedFood = () => {
+
   const [loading, setLoading] = useState(true);
   const [featuredFoods, setFeaturedFoods] = useState< FoodCardProps []>([]);
 
