@@ -44,7 +44,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({ onVerify }) => {
     setIsTimerActive(true);
 
     try {
-      const response = await fetch(`http://192.168.1.67:8000/api/resend-otp`, {
+      const response = await fetch(`http://192.168.1.66:8000/api/resend-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({ onVerify }) => {
 
     // Send OTP to the backend for verification
     try {
-      const response = await fetch(`http://192.168.1.67:8000/api/verify-otp`, {
+      const response = await fetch(`http://192.168.1.66:8000/api/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

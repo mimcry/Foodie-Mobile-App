@@ -14,7 +14,7 @@ const OfferCard = () => {
   const fetchOffers = async () => {
     try {
    
-      const response = await fetch("http://192.168.1.67:9002/food");
+      const response = await fetch("http://192.168.1.66:9002/food");
       const data = await response.json();
  
       const offerItems = data.filter((item: { offer: any; }) => item.offer);

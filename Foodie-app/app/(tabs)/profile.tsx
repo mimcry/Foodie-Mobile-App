@@ -98,7 +98,7 @@ setRefreshKey((prevKey) => prevKey + 1);
   if(!access_token){
     console.log("No token found. Please log in again.");
   }
-        const response = await fetch(`http://192.168.1.67:8000/profile/${id}/avatar`, {
+        const response = await fetch(`http://192.168.1.66:8000/profile/${id}/avatar`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -136,7 +136,7 @@ setRefreshKey((prevKey) => prevKey + 1);
 
     try {
       
-      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+      const response = await fetch(`http://192.168.1.66:8000/profile/${id}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${access_token}` },
       });
@@ -177,7 +177,7 @@ setRefreshKey((prevKey) => prevKey + 1);
     {
       title: "Account Settings",
       items: [
-        { icon: "🔧", title: "Edit Profile" },
+        { icon: "🔧", title: "Edit Profile",route:"setIsEditing(true)" },
         { icon: "🔒", title: "Change Password" },
         { icon: "🔔", title: "Notifications" },
       ],
@@ -208,7 +208,7 @@ setRefreshKey((prevKey) => prevKey + 1);
     try {
       const access_token =await  getAccessToken();
       const id = await userId();
-      const response = await fetch(`http://192.168.1.67:8000/profile/${id}`, {
+      const response = await fetch(`http://192.168.1.66:8000/profile/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -289,8 +289,8 @@ setRefreshKey((prevKey) => prevKey + 1);
       borderRadius: 360,
     }}
   >
- {avatarUrl && avatarUri ?(   <Image
-   source={{ uri:`http://192.168.1.67:8000${avatarUrl||avatarUri}` }}
+ {avatarUrl || avatarUri ?(   <Image
+   source={{ uri:`http://192.168.1.66:8000${avatarUrl||avatarUri}` }}
       style={{
         width: 100,
         height: 100,
@@ -434,7 +434,7 @@ setRefreshKey((prevKey) => prevKey + 1);
                 paddingVertical: 12,
                 paddingHorizontal: 15,
               }}
-              onPress={() => console.log(`Navigating to ${item.title}`)}
+              onPress={() => item?.route}
             >
               <Text
                 style={{

@@ -34,7 +34,7 @@ const Homepage: React.FC = () => {
   // }, []);
 
   // const fetchFoodData = () => {
-  //   fetch("http://192.168.1.67:9002/food")
+  //   fetch("http://192.168.1.66:9002/food")
   //     .then((response) => response.json())
   //     .then((data) => {
   //       setFoodItems(data);
@@ -46,7 +46,7 @@ const Homepage: React.FC = () => {
   // console.log("filterdfood", filteredFoodItems);
   // console.log("tags", tags);
   // const fetchTagData = () => {
-  //   fetch("http://192.168.1.67:9002/tags")
+  //   fetch("http://192.168.1.66:9002/tags")
   //     .then((response) => response.json())
   //     .then((data) => setTags(data))
   //     .catch((error) => console.error("Error fetching tags:", error));

@@ -17,7 +17,7 @@ const past_order = () => {
   const fetchFoodItems = async () => {
     try {
       const access_token = await getAccessToken();
-      const response = await fetch("http://192.168.1.67:8000/fooddetails/menu",{  method: "GET",
+      const response = await fetch("http://192.168.1.66:8000/fooddetails/menu",{  method: "GET",
         headers: { Authorization: `Bearer ${access_token}` },
       });
       const data = await response.json();
