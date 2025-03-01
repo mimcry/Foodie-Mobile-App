@@ -15,6 +15,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FoodCardProps } from "@/utils";
 export const ipAddress = "http://192.168.1.66:9002";
 import { router } from "expo-router";
+import { useDispatch, UseDispatch } from "react-redux";
+import { addToCart } from "@/redux/cartSlice";
 interface GlobalConfig {
   fontSize: {
     large: number;
@@ -103,7 +105,19 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
       },
     });
   };
-
+  const dispatch = useDispatch();
+ const handleAddToCart = (prosps: any) => {
+    dispatch(
+      addToCart({
+        id: props.food_id,
+        name: props.food_name,
+        price:props.price,
+        image:props.image,
+        description: props.description || "",
+        quantity: 1,
+      })
+    );
+  };
   return (
     <View>
       <View
@@ -149,7 +163,7 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
                 <Text style={{ color: "white" }}> {props.offer}% Off</Text>
               </View>
             )}
-            <TouchableOpacity activeOpacity={0.5} onPress={onPressItem}>
+            <TouchableOpacity activeOpacity={0.5} onPress={()=>handleAddToCart(props)}>
               <Icon
                 name="plus"
                 size={15}

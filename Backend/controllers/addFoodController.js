@@ -5,15 +5,18 @@ const addFood = async (req, res) => {
   console.log("Request Body:", req.body);
 
   try {
-
-   if (!foodname || !price || !description || !tags) {
+    if (!foodname || !price || !description || !tags) {
       return res.status(400).json({ error: "Please fill all fields" });
     }
-    if(!offer){
-        return res.status(400).json({error:"Please fill the offer feild. If no offer then write 0"})
+    if (!offer) {
+      return res
+        .status(400)
+        .json({
+          error: "Please fill the offer feild. If no offer then write 0",
+        });
     }
-    if(!req.file){
-        return res.status(400).json({error:"Please upload an image"})
+    if (!req.file) {
+      return res.status(400).json({ error: "Please upload an image" });
     }
 
     // Insert data into the database
@@ -22,9 +25,9 @@ const addFood = async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING *;
     `;
-    
+
     // Example: Assume the image comes from the request
-    const image = `/uploads/foodimage/${req.file.filename}`
+    const image = `/uploads/foodimage/${req.file.filename}`;
 
     const values = [foodname, price, offer, description, tags, image];
 
@@ -40,17 +43,37 @@ const addFood = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-const getFood= async (req,res)=>{
-    try{
-        const food = await pool.query("SELECT * FROM admin");
-        return res.json(food.rows);
-
+const getFood = async (req, res) => {
+  try {
+    const food = await pool.query("SELECT * FROM admin");
+    return res.json(food.rows);
+  } catch (error) {
+    console.error("Error fetching food:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+const getFoodById = async (req, res) => {
+  const { id } = req.params;
+  console.log("id that is got is ", id);
+  const { food } = req;
+  if (parseInt(id) !== food.id) {
+    return res
+      .status(403)
+      .json({ error: "You are not authorized to view this profile" });
+  }
+  try {
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [
+      id,
+    ]);
+    if (food.rows.length === 0) {
+      return res.status(404).json({ error: "No food found for this id" });
     }
-    catch(error){
-        console.error("Error fetching food:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-}
+    res.json(food.rows);
+  } catch (error) {
+    console.error("Error fetching food:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 const updateFood = async (req, res) => {
   const { foodname, price, offer, description, tags } = req.body;
   const { id } = req.params;
@@ -72,29 +95,30 @@ const updateFood = async (req, res) => {
     return res.status(400).json({ error: "Please provide tags" });
   }
 
-  const image = req.file ? `/uploads/foodimage/${req.file.filename}` : null; 
+  const image = req.file ? `/uploads/foodimage/${req.file.filename}` : null;
   try {
-   
-    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [
+      id,
+    ]);
     if (food.rows.length === 0) {
       return res.status(404).json({ error: "Food not found" });
     }
-   
+
     // Build dynamic query to update fields that are provided
     const queryFields = [];
     const values = [];
     let index = 1;
-    
+
     if (foodname) {
       queryFields.push(`food_name = $${index++}`);
       values.push(foodname);
     }
-  
+
     if (price) {
       queryFields.push(`price = $${index++}`);
       values.push(price);
     }
-    
+
     if (offer) {
       queryFields.push(`offer = $${index++}`);
       values.push(offer);
@@ -142,22 +166,23 @@ const updateFood = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-const deleteFood= async (req,res)=>{
-  const {id}=req.params;
-  try{
-    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [id]);
+const deleteFood = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const food = await pool.query("SELECT * FROM admin WHERE food_id = $1", [
+      id,
+    ]);
     if (food.rows.length === 0) {
       return res.status(404).json({ error: "Food not found" });
     }
-    const result = await pool.query("DELETE FROM admin WHERE food_id = $1", [id]);
+    const result = await pool.query("DELETE FROM admin WHERE food_id = $1", [
+      id,
+    ]);
     return res.json({ message: "was deleted successfully" });
-  }
-  catch(error){
+  } catch (error) {
     console.error("Error deleting food:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
 
-  
-  
-module.exports = { addFood,getFood,updateFood,deleteFood };
+module.exports = { addFood, getFood, updateFood, deleteFood,getFoodById };
