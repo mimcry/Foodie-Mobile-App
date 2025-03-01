@@ -41,7 +41,7 @@ const Popular = () => {
 
   return (
     <View>
-      <FoodTitle Topic="Popular" Title="Foods" />
+      <FoodTitle Topic="Popular" Title="Now" />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -61,6 +61,10 @@ const Popular = () => {
             sides={item.sides}
             drinks={item.drinks}
             ingredients={item.ingredients}
+            averageRating={item.averageRating}
+            reviewsCount={item.reviewsCount}
+            duration={item.duration}
+            calories={item.calories}
           />
         ))}
       </ScrollView>

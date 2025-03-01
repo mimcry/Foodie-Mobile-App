@@ -81,9 +81,9 @@ export const FoodTitle: React.FC<FoodTitleProps> = ({ Topic, Title }) => {
     <View>
       <Text
         style={{
-          fontSize: Global.fontSize.large,
-          fontWeight: "bold",
-          marginTop: "5%",
+          fontSize: 18,
+          fontWeight: "700",
+          color: "#333",
         }}
       >
         {Topic}
@@ -101,18 +101,17 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
       pathname: "/(food_description)/food_description",
       params: {
         item: JSON.stringify(props),
-        
       },
     });
   };
   const dispatch = useDispatch();
- const handleAddToCart = (prosps: any) => {
+  const handleAddToCart = (prosps: any) => {
     dispatch(
       addToCart({
         id: props.food_id,
         name: props.food_name,
-        price:props.price,
-        image:props.image,
+        price: props.price,
+        image: props.image,
         description: props.description || "",
         quantity: 1,
       })
@@ -163,20 +162,23 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
                 <Text style={{ color: "white" }}> {props.offer}% Off</Text>
               </View>
             )}
-            <TouchableOpacity activeOpacity={0.5} onPress={()=>handleAddToCart(props)}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => handleAddToCart(props)}
+            >
               <Icon
                 name="plus"
                 size={15}
-                color="black"
+                color="white"
                 style={{
                   position: "absolute",
                   zIndex: 2,
                   marginTop: 50,
                   right: 0,
-                  borderWidth: 1,
+
                   borderRadius: 25,
-                  borderColor: "white",
-                  backgroundColor: "white",
+
+                  backgroundColor: "#4CAF50",
                   alignSelf: "center",
                   elevation: 5,
                   padding: 4,
@@ -184,19 +186,18 @@ export const FoodCard: React.FC<FoodCardProps> = (props) => {
               />
             </TouchableOpacity>
           </View>
-          <Text>{props.food_name}</Text>
-          {props.offer ==0 ? (
-                <Text style={{ color: "green" }}>Rs. {props.price}</Text>
+          <Text numberOfLines={1} ellipsizeMode="Tail">{props.food_name}</Text>
+          {props.offer == 0 ? (
+            <Text style={{ color: "green" }}>Rs. {props.price}</Text>
           ) : (
-       
             <View style={{ flexDirection: "row" }}>
-            <Text style={{ textDecorationLine: "line-through" }}>
-              Rs.{props.price}
-            </Text>
-            <Text style={{ color: "green", marginLeft: "auto" }}>
-              Rs.{props.price - (props.price * props.offer) / 100}
-            </Text>
-          </View>
+              <Text style={{ textDecorationLine: "line-through",fontSize:10,marginTop:4 }}>
+                Rs.{props.price}
+              </Text>
+              <Text style={{ color: "green", marginLeft: "auto" }}>
+                Rs.{props.price - (props.price * props.offer) / 100}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
       </View>

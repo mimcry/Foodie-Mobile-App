@@ -69,6 +69,10 @@ const OfferCard = () => {
             ingredients={item.ingredients}
             sidesprice={item.sidesprice}
             drinkprice={item.drinkprice}
+            averageRating={item.averageRating}
+            reviewsCount={item.reviewsCount}
+            duration={item.duration}
+            calories={item.calories}
           />
         ))}
       </ScrollView>

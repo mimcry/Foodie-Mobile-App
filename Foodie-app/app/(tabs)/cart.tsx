@@ -125,7 +125,7 @@ const CartScreen = () => {
                     </View>
 
                     {item.description && (
-                      <Text style={styles.itemOptions}>{item.description}</Text>
+                      <Text style={styles.itemOptions} ellipsizeMode="tail" numberOfLines={2}>{item.description}</Text>
                     )}
                     <View style={styles.itemFooter}>
                       <Text style={styles.itemPrice}>

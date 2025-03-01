@@ -1,2 +1,2 @@
-ALTER TABLE order_items
-ADD COLUMN user_id INT;
+ALERT TABLE admin 
+ADD COLUMN calories VARCHAR(50);

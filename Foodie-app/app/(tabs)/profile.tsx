@@ -150,6 +150,8 @@ setRefreshKey((prevKey) => prevKey + 1);
       setUserDetails(data);
       setEditedUser(data);
       setFormData(data);
+     await AsyncStorage.setItem("user image",userDetails?.avatar??"")
+     await AsyncStorage.setItem("user name", userDetails?.name ?? "")
     } catch (error) {
       console.error("Error fetching user details:", error);
       setError("Failed to load user profile");
