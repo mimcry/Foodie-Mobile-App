@@ -11,54 +11,30 @@ import { ArrowLeft } from 'lucide-react-native';
 //   return <Ionicons name={name} size={size} color={color} />;
 // };
 
-const CartButton = () => {
-  return (
-    <View
-      style={{
-        backgroundColor: '#df2020',
-        width: 68,
-        height: 68,
-        borderRadius: 35,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: Platform.OS === 'ios' ? 45 : 35,
-        ...Platform.select({
-          ios: {
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-          },
-        }),
-      }}
-    >
-      <Icon name="ShoppingCart" color="#FFFF" size={28} />
-    </View>
-  );
-};
+
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: 'gold',
-        tabBarInactiveTintColor: '#ffff',
+        tabBarActiveTintColor: '#df2020',
+        tabBarInactiveTintColor: 'gray',
         headerShown: false,
         
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            backgroundColor: '#df2020',
+          
             position: 'absolute',
             height:88,elevation: 24,
           },
           android: {
-            backgroundColor: '#df2020',
+
             height: 65,
             elevation: 24,
           },
           default: {
-            backgroundColor: '#df2020',
+         
             elevation: 6,
             height: 65,
           },
@@ -90,7 +66,7 @@ export default function TabLayout() {
               
             </TouchableOpacity>
           ),headerTitleAlign: "center", headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Past Order</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Orders</Text>
           ),
           tabBarIcon: ({ color }) => <Icon name="CalendarArrowUp" color={color} size={24}/>,
           tabBarLabelStyle: {
@@ -99,28 +75,11 @@ export default function TabLayout() {
           tabBarItemStyle: { marginTop: 4 },
         }}
       />
-      <Tabs.Screen
-        name="cart"
-        options={{
-          title: '',headerShown:true,
-          headerLeft:()=>(
-            <TouchableOpacity
-           
-             style={{paddingHorizontal:8}} 
-            >
-              <ArrowLeft size={24} color="#df2020" />
-              
-            </TouchableOpacity>
-          ),  headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Cart</Text>
-          ),headerTitleAlign: "center",
-          tabBarIcon: ({ color }) => <CartButton  />,tabBarItemStyle: { marginTop: 1 },
-        }}
-      />
+     
       <Tabs.Screen
         name="menu"
         options={{
-          title: 'Add Food',headerShown:true,
+          title: 'Menu',headerShown:true,
           headerLeft:()=>(
             <TouchableOpacity
            
@@ -130,7 +89,7 @@ export default function TabLayout() {
               
             </TouchableOpacity>
           ), headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Add Food</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Food  Menu</Text>
           ),headerTitleAlign: "center",
           tabBarIcon: ({ color }) => <Icon name="FileText" color={color} size={24} />,
           tabBarLabelStyle: {
@@ -153,7 +112,7 @@ export default function TabLayout() {
             </TouchableOpacity>
           ),headerTitleAlign: "center",
           headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Profile</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Profile</Text>
           ),
           tabBarIcon: ({ color }) => <Icon name="User" color={color} size={24} />,
           tabBarLabelStyle: {
