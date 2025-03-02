@@ -10,8 +10,8 @@ export default function Layout() {
   return (
     <Stack>
      
-      <Stack.Screen name="food_description" options={{
-          title: 'Food Description',headerShown:true,
+      <Stack.Screen name="addfood" options={{
+          title: 'Add Food',headerShown:true,
           headerLeft:()=>(
             <TouchableOpacity
            
@@ -22,7 +22,7 @@ export default function Layout() {
             </TouchableOpacity>
           ),headerTitleAlign: "center",
           headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Food Details</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Add Food</Text>
           ),
          
         

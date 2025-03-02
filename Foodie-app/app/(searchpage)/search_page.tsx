@@ -78,6 +78,10 @@ const RestaurantSearchPage = () => {
         params:{item:JSON.stringify(item)}
       })
     }}>
+     <Image
+                   source={{ uri: `http://192.168.1.66:8000${item.image}` }}
+                   style={styles.restaurantImage}
+                 />
       <Text style={styles.menuItemName}>{item.food_name}</Text>
       <Text style={styles.menuItemPrice}>Rs{item.price}</Text>
     </TouchableOpacity>
@@ -89,7 +93,7 @@ const RestaurantSearchPage = () => {
       
       {/* Restaurant Header */}
       <View style={styles.restaurantHeader}>
-        <Image source={require("@/image/logo.png")}  style={styles.restaurantImage} />
+      
         <View style={styles.restaurantInfo}>
           <Text style={styles.restaurantName}>Greatest food delivery app in Nepal</Text>
           <Text style={styles.restaurantDescription}>Enjoy our delicious foods made with fresh ingredients!</Text>

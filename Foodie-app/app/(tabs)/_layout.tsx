@@ -90,7 +90,7 @@ export default function TabLayout() {
               
             </TouchableOpacity>
           ),headerTitleAlign: "center", headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Past Order</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Past Order</Text>
           ),
           tabBarIcon: ({ color }) => <Icon name="CalendarArrowUp" color={color} size={24}/>,
           tabBarLabelStyle: {
@@ -112,7 +112,7 @@ export default function TabLayout() {
               
             </TouchableOpacity>
           ),  headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Cart</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Cart</Text>
           ),headerTitleAlign: "center",
           tabBarIcon: ({ color }) => <CartButton  />,tabBarItemStyle: { marginTop: 1 },
         }}
@@ -130,7 +130,7 @@ export default function TabLayout() {
               
             </TouchableOpacity>
           ), headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Menu</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Menu</Text>
           ),headerTitleAlign: "center",
           tabBarIcon: ({ color }) => <Icon name="FileText" color={color} size={24} />,
           tabBarLabelStyle: {
@@ -153,7 +153,7 @@ export default function TabLayout() {
             </TouchableOpacity>
           ),headerTitleAlign: "center",
           headerTitle: () => (
-            <Text style={{fontSize:20,color:"#df2020"}}>Profile</Text>
+            <Text style={{fontSize:20,color:"#df2020",fontWeight:700}}>Profile</Text>
           ),
           tabBarIcon: ({ color }) => <Icon name="User" color={color} size={24} />,
           tabBarLabelStyle: {

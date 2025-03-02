@@ -50,7 +50,7 @@ const CartScreen = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${access_token}`,
+          Authorization: `Bearer Rs{access_token}`,
         },
         body: JSON.stringify(orderData),
       });
@@ -88,14 +88,10 @@ const CartScreen = () => {
           <View style={styles.restaurantSection}>
             <Text style={styles.sectionTitle}>Your Items</Text>
             <TouchableOpacity
-              style={{
-                backgroundColor: "#df2020",
-                padding: 0,
-                borderRadius: "30px",
-              }}
+              
               onPress={() => dispatch(clearCart())}
             >
-              <Text style={{ padding: 8, color: "white" }}>Clear Cart</Text>
+              <Text style={{ padding: 8, color: "#df2020",fontWeight:700 }}>Clear Cart</Text>
             </TouchableOpacity>
           </View>
 
@@ -129,7 +125,7 @@ const CartScreen = () => {
                     )}
                     <View style={styles.itemFooter}>
                       <Text style={styles.itemPrice}>
-                        ${(item.price * item.quantity).toFixed(2)}
+                        Rs{(item.price * item.quantity).toFixed(2)}
                       </Text>
                       <View style={styles.quantitySelector}>
                         <TouchableOpacity
@@ -193,21 +189,21 @@ const CartScreen = () => {
               <Text style={styles.summaryTitle}>Order Summary</Text>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Subtotal</Text>
-                <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
+                <Text style={styles.summaryValue}>Rs{subtotal.toFixed(2)}</Text>
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Delivery Fee</Text>
                 <Text style={styles.summaryValue}>
-                  ${deliveryFee.toFixed(2)}
+                  Rs{deliveryFee.toFixed(2)}
                 </Text>
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Tax</Text>
-                <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
+                <Text style={styles.summaryValue}>Rs{tax.toFixed(2)}</Text>
               </View>
               <View style={[styles.summaryRow, styles.totalRow]}>
                 <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+                <Text style={styles.totalValue}>Rs{total.toFixed(2)}</Text>
               </View>
             </View>
 
