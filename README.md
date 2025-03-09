@@ -8,10 +8,7 @@ Foodie is a modern food delivery mobile application built using **React Native**
 
 ✅ Browse & search for foods 🍽️  
 ✅ Place food orders with a simple UI 🛒  
-✅ Real-time order tracking 📍  
 ✅ Secure authentication & user profiles 🔐  
-✅ Integrated payment gateway 💳  
-✅ Dark mode support 🌙  
 ✅ Optimized for both Android & iOS 📱  
 
 ---
