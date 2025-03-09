@@ -32,10 +32,13 @@ Foodie is a modern food delivery mobile application built using **React Native**
 
 ## 📸 Screenshots
 
-| Home Screen | Restaurant Dashborad | Cart |
-|------------|------------------|------|
-|<img src="https://github.com/user-attachments/assets/5fdbd50b-a8f8-4631-ba75-09870f251578" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/5932e3b3-eee7-4f36-a398-e804c37d22d2" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/4dfb4fbb-b6d5-4788-9f16-b6b6205a1806" alt="Screenshot Description" width="200" height="400" />|
+| Home Screen | Restaurant Dashborad | Cart | Food Description |
+|------------|------------------|------|------------------ |
 
+|<img src="https://github.com/user-attachments/assets/5fdbd50b-a8f8-4631-ba75-09870f251578" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/5932e3b3-eee7-4f36-a398-e804c37d22d2" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/4dfb4fbb-b6d5-4788-9f16-b6b6205a1806" alt="Screenshot Description" width="200" height="400" />| <img src="https://github.com/user-attachments/assets/60894f6e-b290-4de6-8d66-9c8241a06b52" alt="Screenshot Description" width="200" height="400" />|
+| Menu| Order History |
+|------|------|
+ |<img src="https://github.com/user-attachments/assets/c7e2dace-81e8-4c21-94af-29db172b7fac" alt="Screenshot Description" width="200" height="400" />| <img src="https://github.com/user-attachments/assets/e7af4a5f-c3da-4f2a-b5b6-80b586b5d3e9" alt="Screenshot Description" width="200" height="400" />|
 ---
 
 ## 🚀 Installation & Setup
