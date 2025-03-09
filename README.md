@@ -32,9 +32,9 @@ Foodie is a modern food delivery mobile application built using **React Native**
 
 ## 📸 Screenshots
 
-| Home Screen | Restaurant Details | Cart |
+| Home Screen | Restaurant Dashborad | Cart |
 |------------|------------------|------|
-| ![Home](screenshots/home.png) | ![Details](screenshots/details.png) | ![Cart](screenshots/cart.png) |
+|<img src="https://github.com/user-attachments/assets/5fdbd50b-a8f8-4631-ba75-09870f251578" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/5932e3b3-eee7-4f36-a398-e804c37d22d2" alt="Screenshot Description" width="200" height="400" /> | <img src="https://github.com/user-attachments/assets/4dfb4fbb-b6d5-4788-9f16-b6b6205a1806" alt="Screenshot Description" width="200" height="400" />|
 
 ---
 
@@ -42,7 +42,7 @@ Foodie is a modern food delivery mobile application built using **React Native**
 
 ### **1. Clone the Repository**
 ```sh
-git clone https://github.com/yourusername/Foodie-App.git
+git clone https://github.com/mimcry/Foodie-Mobile-App.git
 cd Foodie-App
 ```
 
@@ -68,19 +68,11 @@ yarn ios  # for iOS (Mac required)
 
 ### **1. Clone & Install Backend**
 ```sh
-git clone https://github.com/yourusername/Foodie-Backend.git
-cd Foodie-Backend
+cd Backend
 npm install
 ```
 
-### **2. Configure Environment Variables** (Create a `.env` file)
-```sh
-PORT=5000
-DATABASE_URL=your_postgresql_connection_string
-JWT_SECRET=your_secret_key
-```
-
-### **3. Start Backend Server**
+### **2. Start Backend Server**
 ```sh
 npm run dev
 ```
@@ -122,8 +114,8 @@ This project is **open-source** and available under the **MIT License**.
 ## 💬 Contact
 
 📧 Email: salongautam4@gmail.com  
-🔗 GitHub: [github.com/yourusername](https://github.com/yourusername)  
-🚀 LinkedIn: [linkedin.com/in/salongautam](https://linkedin.com/in/salongautam)
+🔗 GitHub: [github.com/yourusername](https://github.com/mimcry)  
+🚀 LinkedIn: [linkedin.com/in/salongautam]([https://linkedin.com/in/salongautam](https://www.linkedin.com/in/salon-gautam-3633b1248/))
 
 ---
 
