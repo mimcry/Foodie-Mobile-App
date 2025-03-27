@@ -114,7 +114,7 @@ This project is **open-source** and available under the **MIT License**.
 ## 💬 Contact
 
 📧 Email: salongautam4@gmail.com  
-🔗 GitHub: [github.com/yourusername](https://github.com/mimcry)  
+🔗 GitHub: (https://github.com/mimcry)  
 🚀 LinkedIn: [linkedin.com/in/salongautam]([https://linkedin.com/in/salongautam](https://www.linkedin.com/in/salon-gautam-3633b1248/))
 
 ---
