@@ -77,7 +77,7 @@ const OrderManagement = () => {
       const access_token = await getAccessToken();
       
       // Replace with your actual API endpoint
-      const response = await fetch("http://192.168.1.66:8000/orders/all", {
+      const response = await fetch("http://192.168.1.70:8000/orders/all", {
         method: "GET",
         headers: { Authorization: `Bearer ${access_token}` },
       });
@@ -217,7 +217,7 @@ const OrderManagement = () => {
             try {
               // In a real app, you would call your API here
               // const access_token = await getAccessToken();
-              // const response = await fetch(`http://192.168.1.66:8000/orders/${orderId}/status`, {
+              // const response = await fetch(`http://192.168.1.70:8000/orders/${orderId}/status`, {
               //   method: "PUT",
               //   headers: { 
               //     Authorization: `Bearer ${access_token}`,

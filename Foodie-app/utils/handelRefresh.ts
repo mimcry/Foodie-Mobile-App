@@ -25,7 +25,7 @@ ToastAndroid.show("Session expired. Please log in again.",ToastAndroid.SHORT)
   const handleRefresh = async () => {
     try {
       const refresh_token = AsyncStorage.getItem("refreshToken")
-      const response = await fetch('http://192.168.1.66:8000/refresh-token', {
+      const response = await fetch('http://192.168.1.70:8000/refresh-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
