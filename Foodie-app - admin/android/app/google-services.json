@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "702169949561",
+    "project_id": "foodie-1b1d7",
+    "storage_bucket": "foodie-1b1d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702169949561:android:12105bf6b7c734c9023ba8",
+        "android_client_info": {
+          "package_name": "com.yaksinc3.Foodieapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5d2a3uJyFZt98ST4vlnt_tFdhJw86i6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

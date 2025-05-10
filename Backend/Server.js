@@ -12,9 +12,11 @@ const profileRouter = require("./routes/profileRoutes");
 const contactRouter = require("./routes/contactRoutes");
 const foodRouter = require("./routes/foodRoutes");
 const orderitemdRouter=require("./routes/orderItemsRoutes")
+const admin = require("firebase-admin");
 require("dotenv").config();
 
 const app = express();
+app.use(bodyParser.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -54,6 +56,47 @@ app.post("/refresh-token", async (req, res) => {
     res.status(403).json({ error: "Invalid or expired refresh token" });
   }
 });
+// Initialize Firebase Admin SDK
+const serviceAccount = require("./serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const sendNotification = async (token, title, body) => {
+  const message = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    token: token, // Send notification to a specific user
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Notification sent successfully:", response);
+    return response;
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    throw error;
+  }
+};
+
+// API Endpoint to Send Notification
+app.post("/send-notification", async (req, res) => {
+  const { token, title, body } = req.body;
+  
+  if (!token || !title || !body) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const response = await sendNotification(token, title, body);
+    res.status(200).json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send notification" });
+  }
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 8000;

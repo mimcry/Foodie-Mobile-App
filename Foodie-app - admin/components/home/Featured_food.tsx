@@ -15,7 +15,7 @@ const FeaturedFood = () => {
 
   const fetchFoodItems = async () => {
     try {
-      const response = await fetch("http://192.168.1.66:9002/food");
+      const response = await fetch("http://192.168.1.70:9002/food");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

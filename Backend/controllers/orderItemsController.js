@@ -4,6 +4,7 @@ const pool = require("../config/db");
 
 const putorderitems =async (req,res)=>{
     const { user_id, total_amount, items } = req.body;
+    console.log("request body:",req.body)
     try {
         // Insert order details into the orders table
         const result = await pool.query(

@@ -103,7 +103,7 @@ const UpdateFoods = () => {
       console.log("FormData content:", formData);
 
       const response = await fetch(
-        `http://192.168.1.66:8000/fooddetails/${foodDetails.food_id}`,
+        `http://192.168.1.70:8000/fooddetails/${foodDetails.food_id}`,
         {
           method: "PUT",
           headers: {
@@ -175,7 +175,7 @@ const UpdateFoods = () => {
           source={{
             uri: foodDetails.image.startsWith('file:///')
               ? foodDetails.image
-              : `http://192.168.1.66:8000${foodDetails.image}`
+              : `http://192.168.1.70:8000${foodDetails.image}`
           }}
           
             style={{

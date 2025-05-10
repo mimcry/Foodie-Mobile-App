@@ -14,7 +14,7 @@ const Popular = () => {
 
   const fetchPopularFood = async () => {
     try {
-      const response = await fetch(`http://192.168.1.66:9002/popular-food`);
+      const response = await fetch(`http://192.168.1.70:9002/popular-food`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

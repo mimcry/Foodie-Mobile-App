@@ -1,11 +1,33 @@
 import { useState, useEffect } from "react";
 import { Redirect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import requestUserPermission from "@/components/requestuserpermission";
+import messaging from '@react-native-firebase/messaging';
+import { Alert } from "react-native";
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [userData, setUserData] = useState(null); 
+useEffect(()=>{
+  requestUserPermission();
+
+},[])
+const getFCMToken = async () => {
+  const token = await messaging().getToken();
+  console.log('FCM Token:', token);
+};
+
+useEffect(() => {
+  getFCMToken();
+  
+}, []);
+useEffect(() => {
+  const unsubscribe = messaging().onMessage(async remoteMessage => {
+    Alert.alert(remoteMessage.notification?.title, remoteMessage.notification?.body);
+  });
+
+  return unsubscribe;
+}, []);
 
   useEffect(() => {
     const checkLoginState = async () => {

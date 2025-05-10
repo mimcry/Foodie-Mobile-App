@@ -44,7 +44,7 @@ const FoodCard = ({ food, onEdit, onDelete }) => {
     <View style={styles.cardContainer}>
       <View style={styles.cardImageContainer}>
         <Image 
-          source={{ uri: `http://192.168.1.66:8000${food.image}`}} 
+          source={{ uri: `http://192.168.1.70:8000${food.image}`}} 
           style={styles.cardImage} 
           resizeMode="cover"
         />
@@ -133,7 +133,7 @@ const MenuList = () => {
             try {
               const access_token = await getAccessToken();
               const response = await fetch(
-                `http://192.168.1.66:8000/fooddetails/${foodItems.food_id}/delete`,
+                `http://192.168.1.70:8000/fooddetails/${foodItems.food_id}/delete`,
                 {
                   method: "DELETE",
                   headers: {
@@ -174,7 +174,7 @@ const MenuList = () => {
     try {
       const access_token = await getAccessToken();
       const response = await fetch(
-        "http://192.168.1.66:8000/fooddetails/menu",
+        "http://192.168.1.70:8000/fooddetails/menu",
         {
           method: "GET",
           headers: { Authorization: `Bearer ${access_token}` },
@@ -240,7 +240,7 @@ const MenuList = () => {
     try {
       const access_token = await getAccessToken();
       const response = await fetch(
-        `http://192.168.1.66:8000/fooddetails/food/${id}`,
+        `http://192.168.1.70:8000/fooddetails/food/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${access_token}` },

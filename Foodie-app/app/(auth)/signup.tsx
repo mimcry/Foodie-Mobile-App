@@ -37,7 +37,7 @@ const SignUp = () => {
     setEmail(formData.email)
 
     try {
-      const response = await fetch("http://192.168.1.66:8000/api/signup", {
+      const response = await fetch("http://192.168.1.70:8000/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

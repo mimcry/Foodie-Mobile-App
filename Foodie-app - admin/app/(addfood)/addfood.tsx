@@ -87,7 +87,7 @@ const addfood = () => {
       const access_token = await getAccessToken();
 
       const response = await fetch(
-        "http://192.168.1.66:8000/fooddetails/food",
+        "http://192.168.1.70:8000/fooddetails/food",
         {
           method: "PUT",
           headers: {
